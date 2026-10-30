@@ -97,7 +97,10 @@ public class RpgTabServerConfig {
 
         builder.push("pelican_api");
         pelicanUrl = builder.comment("URL du panel Pelican (ex: https://panel.example.com)").define("pelicanUrl", "");
-        pelicanApiKey = builder.comment("Cle API Client Pelican (ex: ptlc_... ou pelican_...)").define("pelicanApiKey", "");
+        pelicanApiKey = builder.comment(
+                "Cle API Client Pelican (Account Settings -> API Credentials / Tokens).\n" +
+                "Permissions requises : Permission de lecture 'server.resources' (Read resources / Read server metrics / WebSocket connection)."
+        ).define("pelicanApiKey", "");
         pelicanServerId = builder.comment("Identifiant court du serveur Pelican (ex: 39de0ded)").define("pelicanServerId", "");
         builder.pop();
 
