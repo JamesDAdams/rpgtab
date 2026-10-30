@@ -53,4 +53,4 @@ Nécessite Java 21 LTS (OpenJDK ou Zulu) :
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.7.0-neoforge-1.21.1.jar`.
+Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.8.0-neoforge-1.21.1.jar`.
