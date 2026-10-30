@@ -282,7 +282,7 @@ public class RpgTabRenderer {
             graphics.drawString(font, line1, startX + (totalWidth - line1W) / 2, footerY + 4, 0xFFE0E0E0, false);
         }
 
-        // Ligne 2 : Chunks serveur, C2ME OpenCL, Distant Horizons & SeedGen
+        // Ligne 2 : Chunks serveur, C2ME OpenCL & Distant Horizons
         StringBuilder line2Sb = new StringBuilder();
         if (cfg.showServerChunks) {
             line2Sb.append("§2☵ ").append(stats.getFormattedChunks());
@@ -294,10 +294,6 @@ public class RpgTabRenderer {
         if (cfg.showServerDh && stats.isDhLoaded()) {
             if (line2Sb.length() > 0) line2Sb.append(" §8| ");
             line2Sb.append("§b🌌 DH: §a").append(stats.getDhGeneratingChunks()).append(" gen");
-        }
-        if (cfg.showServerSeedGen && stats.isSeedGenLoaded()) {
-            if (line2Sb.length() > 0) line2Sb.append(" §8| ");
-            line2Sb.append("§e🌱 SeedGen: §a").append(stats.getSeedGenGeneratingChunks()).append(" gen");
         }
 
         String line2 = line2Sb.toString();

@@ -152,19 +152,11 @@ public class ServerHardwareStats implements Serializable {
     }
 
     public String getFormattedChunks() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(totalLoadedChunks).append(" loaded");
-        if (totalGeneratingChunks > 0 || dhGeneratingChunks > 0 || seedGenGeneratingChunks > 0) {
-            sb.append(" (Gen: ").append(totalGeneratingChunks);
-            if (dhGeneratingChunks > 0) {
-                sb.append(" + DH:").append(dhGeneratingChunks);
-            }
-            if (seedGenGeneratingChunks > 0) {
-                sb.append(" + SG:").append(seedGenGeneratingChunks);
-            }
-            sb.append(")");
+        if (totalGeneratingChunks > 0) {
+            return totalLoadedChunks + " loaded (Gen: " + totalGeneratingChunks + ")";
+        } else {
+            return totalLoadedChunks + " loaded";
         }
-        return sb.toString();
     }
 
     public String getFormattedUptime() {

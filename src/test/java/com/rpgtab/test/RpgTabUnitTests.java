@@ -301,7 +301,7 @@ public class RpgTabUnitTests {
         if (stats.getTotalLoadedChunks() != 850 || stats.getTotalGeneratingChunks() != 4 || stats.getDhGeneratingChunks() != 12 || stats.getSeedGenGeneratingChunks() != 3) {
             throw new AssertionError("Server chunk stats mismatch");
         }
-        if (!"850 loaded (Gen: 4 + DH:12 + SG:3)".equals(stats.getFormattedChunks())) {
+        if (!"850 loaded (Gen: 4)".equals(stats.getFormattedChunks())) {
             throw new AssertionError("Formatted chunks mismatch: " + stats.getFormattedChunks());
         }
         if (!"42%".equals(stats.getGpuStats())) {
