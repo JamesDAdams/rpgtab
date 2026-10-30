@@ -289,6 +289,15 @@ public class RpgTabUnitTests {
         if (!"4.0 Go/16.0 Go §8(Swap: 1.0 Go/8.0 Go)".equals(stats.getFormattedMemory())) {
             throw new AssertionError("Memory format mismatch: " + stats.getFormattedMemory());
         }
+
+        // Test with 0 swap usage: should NOT display swap
+        com.rpgtab.server.ServerHardwareStats noSwapStats = new com.rpgtab.server.ServerHardwareStats(
+                20.0f, 10.0f, 50.0, 600, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
+                0L, 8L * 1024L * 1024L * 1024L, 1000L, 100L, 100L, 100, 0, 0, false, false, false, "", ""
+        );
+        if (!"4.0 Go/16.0 Go".equals(noSwapStats.getFormattedMemory())) {
+            throw new AssertionError("Zero swap should not be displayed: " + noSwapStats.getFormattedMemory());
+        }
         if (stats.getTotalLoadedChunks() != 850 || stats.getTotalGeneratingChunks() != 4 || stats.getDhGeneratingChunks() != 12) {
             throw new AssertionError("Server chunk stats mismatch");
         }

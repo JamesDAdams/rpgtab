@@ -134,7 +134,8 @@ public class ServerHardwareStats implements Serializable {
 
     public String getFormattedMemory() {
         String ramStr = formatMemory(usedRamBytes) + "/" + formatMemory(maxRamBytes);
-        if (maxSwapBytes > 0 || usedSwapBytes > 0) {
+        // Only display Swap if swap is actually being used (usedSwapBytes > 0)
+        if (usedSwapBytes > 0) {
             String swapStr = formatMemory(usedSwapBytes);
             if (maxSwapBytes > 0) {
                 swapStr += "/" + formatMemory(maxSwapBytes);
