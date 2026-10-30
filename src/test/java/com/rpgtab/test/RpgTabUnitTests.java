@@ -249,7 +249,8 @@ public class RpgTabUnitTests {
             throw new AssertionError("Default playTimeColor mismatch");
         }
         if (!data.showServerFooter || !data.showServerTps || !data.showServerCpu || !data.showServerRam
-                || !data.showServerUptime || !data.showServerNetwork || !data.showServerGpu) {
+                || !data.showServerUptime || !data.showServerNetwork || !data.showServerGpu
+                || !data.showServerDh || !data.showServerSeedGen) {
             throw new AssertionError("Default server metrics flags mismatch");
         }
         System.out.println("[PASS] RpgTabConfigData default values tests");
@@ -268,14 +269,20 @@ public class RpgTabUnitTests {
 
     private static void testServerHardwareStats() {
         com.rpgtab.server.ServerHardwareStats stats = new com.rpgtab.server.ServerHardwareStats(
-                19.8f, 15.2f, 35.5, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
-                90000L, 2500000L, 500000L, true, "NVIDIA GeForce RTX 4070"
+                19.8f, 15.2f, 210.0, 600, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
+                90000L, 2500000L, 500000L, true, true, true, "NVIDIA GeForce RTX 4070"
         );
         if (stats.getTps() != 19.8f || stats.getMspt() != 15.2f) {
             throw new AssertionError("TPS/MSPT mismatch");
         }
-        if (stats.getCpuUsage() != 35.5) {
+        if (stats.getCpuUsage() != 210.0 || stats.getMaxCpuPercent() != 600) {
             throw new AssertionError("CPU mismatch");
+        }
+        if (!"210%/600%".equals(stats.getFormattedCpu())) {
+            throw new AssertionError("CPU format mismatch: " + stats.getFormattedCpu());
+        }
+        if (!stats.isDhLoaded() || !stats.isSeedGenLoaded()) {
+            throw new AssertionError("DH / SeedGen loaded flags mismatch");
         }
         if (!"1d 1h 0m".equals(stats.getFormattedUptime())) {
             throw new AssertionError("Uptime mismatch: " + stats.getFormattedUptime());

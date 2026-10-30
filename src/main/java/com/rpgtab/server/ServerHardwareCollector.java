@@ -22,6 +22,8 @@ public class ServerHardwareCollector {
 
     private static String cachedGpuName = null;
     private static Boolean cachedC2meLoaded = null;
+    private static Boolean cachedDhLoaded = null;
+    private static Boolean cachedSeedGenLoaded = null;
 
     private static boolean initOshi() {
         if (oshiAvailable != null) {
@@ -53,6 +55,29 @@ public class ServerHardwareCollector {
         return cachedC2meLoaded;
     }
 
+    public static boolean isDhLoaded() {
+        if (cachedDhLoaded == null) {
+            try {
+                cachedDhLoaded = ModList.get().isLoaded("distanthorizons");
+            } catch (Throwable t) {
+                cachedDhLoaded = false;
+            }
+        }
+        return cachedDhLoaded;
+    }
+
+    public static boolean isSeedGenLoaded() {
+        if (cachedSeedGenLoaded == null) {
+            try {
+                cachedSeedGenLoaded = ModList.get().isLoaded("seedrenderer")
+                        || ModList.get().isLoaded("seedgen");
+            } catch (Throwable t) {
+                cachedSeedGenLoaded = false;
+            }
+        }
+        return cachedSeedGenLoaded;
+    }
+
     public static String getC2MEGpuName() {
         try {
             Class<?> locatorClass = Class.forName("com.ishland.c2me.opts.accel.opencl.common.enumeration.OpenCLDeviceLocator");
@@ -62,7 +87,6 @@ public class ServerHardwareCollector {
                 java.lang.reflect.Method getStringMethod = utilClass.getMethod("getDeviceInfoStringUTF8", long.class, int.class);
                 for (Object meta : list) {
                     long devicePtr = meta.getClass().getField("devicePtr").getLong(meta);
-                    // 0x102B corresponds to CL_DEVICE_NAME in OpenCL
                     String name = (String) getStringMethod.invoke(null, devicePtr, 0x102B);
                     if (name != null && !name.trim().isEmpty() && !name.equalsIgnoreCase("unknown")) {
                         return name.trim();
@@ -104,21 +128,21 @@ public class ServerHardwareCollector {
             return cachedGpuName;
         }
 
-        // 1. Try C2ME OpenCL enumeration (most accurate for Minecraft chunk gen)
+        // 1. C2ME OpenCL direct device name
         String c2meGpu = getC2MEGpuName();
         if (!c2meGpu.isEmpty()) {
             cachedGpuName = c2meGpu;
             return cachedGpuName;
         }
 
-        // 2. Try Linux NVIDIA procfs (Pelican/Docker container environment)
+        // 2. Linux NVIDIA procfs
         String procGpu = getNvidiaProcfsGpuName();
         if (!procGpu.isEmpty()) {
             cachedGpuName = procGpu;
             return cachedGpuName;
         }
 
-        // 3. Try OSHI hardware graphics cards
+        // 3. OSHI hardware graphics cards
         if (initOshi()) {
             try {
                 Object hardware = oshiSystemInfo.getClass().getMethod("getHardware").invoke(oshiSystemInfo);
@@ -135,7 +159,6 @@ public class ServerHardwareCollector {
             } catch (Throwable ignored) {}
         }
 
-        // Fallback: If C2ME OpenCL is loaded and GPU acceleration is on, indicate OpenCL Device
         if (isC2meOpenclLoaded()) {
             cachedGpuName = "OpenCL Acceleration GPU";
         } else {
@@ -144,63 +167,186 @@ public class ServerHardwareCollector {
         return cachedGpuName;
     }
 
-    public static double getCpuUsage() {
+    public static int getContainerAllocatedCores() {
+        // Read cgroup v2 cpu.max: "quota period"
+        try {
+            File v2Max = new File("/sys/fs/cgroup/cpu.max");
+            if (v2Max.exists()) {
+                String content = Files.readString(v2Max.toPath()).trim();
+                String[] parts = content.split("\\s+");
+                if (parts.length >= 2 && !parts[0].equals("max")) {
+                    double quota = Double.parseDouble(parts[0]);
+                    double period = Double.parseDouble(parts[1]);
+                    if (period > 0) {
+                        return (int) Math.max(1, Math.round(quota / period));
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+
+        // Read cgroup v1: cpu.cfs_quota_us and cpu.cfs_period_us
+        try {
+            File quotaFile = new File("/sys/fs/cgroup/cpu/cpu.cfs_quota_us");
+            File periodFile = new File("/sys/fs/cgroup/cpu/cpu.cfs_period_us");
+            if (quotaFile.exists() && periodFile.exists()) {
+                long quota = Long.parseLong(Files.readString(quotaFile.toPath()).trim());
+                long period = Long.parseLong(Files.readString(periodFile.toPath()).trim());
+                if (quota > 0 && period > 0) {
+                    return (int) Math.max(1, Math.round((double) quota / (double) period));
+                }
+            }
+        } catch (Throwable ignored) {}
+
+        return Math.max(1, Runtime.getRuntime().availableProcessors());
+    }
+
+    public static double getProcessCpuUsage(int cores) {
+        try {
+            java.lang.management.OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+            if (osBean instanceof com.sun.management.OperatingSystemMXBean sunOsBean) {
+                double procLoad = sunOsBean.getProcessCpuLoad();
+                if (procLoad >= 0.0) {
+                    // procLoad is between 0.0 and 1.0 (relative to total CPU cores of JVM)
+                    return procLoad * cores * 100.0;
+                }
+            }
+        } catch (Throwable ignored) {}
+
         if (initOshi() && oshiProcessor != null && prevCpuTicks != null) {
             try {
                 double load = (double) oshiProcessor.getClass().getMethod("getSystemCpuLoadBetweenTicks", long[].class)
                         .invoke(oshiProcessor, (Object) prevCpuTicks);
                 prevCpuTicks = (long[]) oshiProcessor.getClass().getMethod("getSystemCpuLoadTicks").invoke(oshiProcessor);
-                if (load >= 0) {
-                    return Math.min(100.0, Math.max(0.0, load * 100.0));
+                if (load >= 0.0) {
+                    return load * cores * 100.0;
                 }
             } catch (Throwable ignored) {}
         }
 
+        return 0.0;
+    }
+
+    public static long[] getContainerMemory() {
+        // Returns [usedBytes, maxBytes]
+        // 1. Try cgroup v2
         try {
-            java.lang.management.OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
-            if (osBean instanceof com.sun.management.OperatingSystemMXBean sunOsBean) {
-                double load = sunOsBean.getCpuLoad();
-                if (load >= 0.0) {
-                    return load * 100.0;
+            File curFile = new File("/sys/fs/cgroup/memory.current");
+            File maxFile = new File("/sys/fs/cgroup/memory.max");
+            if (curFile.exists()) {
+                long used = Long.parseLong(Files.readString(curFile.toPath()).trim());
+                long max = 0;
+                if (maxFile.exists()) {
+                    String maxStr = Files.readString(maxFile.toPath()).trim();
+                    if (!maxStr.equals("max")) {
+                        max = Long.parseLong(maxStr);
+                    }
+                }
+                if (max <= 0) {
+                    max = Runtime.getRuntime().maxMemory();
+                }
+                return new long[]{used, max};
+            }
+        } catch (Throwable ignored) {}
+
+        // 2. Try cgroup v1
+        try {
+            File curFile = new File("/sys/fs/cgroup/memory/memory.usage_in_bytes");
+            File maxFile = new File("/sys/fs/cgroup/memory/memory.limit_in_bytes");
+            if (curFile.exists()) {
+                long used = Long.parseLong(Files.readString(curFile.toPath()).trim());
+                long max = 0;
+                if (maxFile.exists()) {
+                    max = Long.parseLong(Files.readString(maxFile.toPath()).trim());
+                    // cgroup v1 huge number means no limit
+                    if (max > 1L << 50) {
+                        max = Runtime.getRuntime().maxMemory();
+                    }
+                }
+                if (max <= 0) {
+                    max = Runtime.getRuntime().maxMemory();
+                }
+                return new long[]{used, max};
+            }
+        } catch (Throwable ignored) {}
+
+        // Fallback: Java Runtime
+        Runtime rt = Runtime.getRuntime();
+        long used = rt.totalMemory() - rt.freeMemory();
+        long max = rt.maxMemory();
+        return new long[]{used, max};
+    }
+
+    public static void updateNetworkSpeeds() {
+        long now = System.currentTimeMillis();
+
+        // 1. Try reading Linux /proc/net/dev (Pelican / Docker container eth0)
+        try {
+            File netDev = new File("/proc/net/dev");
+            if (netDev.exists()) {
+                List<String> lines = Files.readAllLines(netDev.toPath());
+                long rxBytes = 0;
+                long txBytes = 0;
+                boolean foundEth = false;
+
+                for (String line : lines) {
+                    String trimmed = line.trim();
+                    if (trimmed.startsWith("eth0:") || (!foundEth && trimmed.startsWith("eth"))) {
+                        String[] parts = trimmed.substring(trimmed.indexOf(':') + 1).trim().split("\\s+");
+                        if (parts.length >= 9) {
+                            rxBytes = Long.parseLong(parts[0]);
+                            txBytes = Long.parseLong(parts[8]);
+                            foundEth = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (foundEth) {
+                    if (prevNetTimeMs > 0 && now > prevNetTimeMs && prevRxBytes >= 0 && prevTxBytes >= 0) {
+                        long durationMs = now - prevNetTimeMs;
+                        long rxDiff = Math.max(0L, rxBytes - prevRxBytes);
+                        long txDiff = Math.max(0L, txBytes - prevTxBytes);
+                        curDlSpeed = (rxDiff * 1000L) / durationMs;
+                        curUlSpeed = (txDiff * 1000L) / durationMs;
+                    }
+                    prevNetTimeMs = now;
+                    prevRxBytes = rxBytes;
+                    prevTxBytes = txBytes;
+                    return;
                 }
             }
         } catch (Throwable ignored) {}
 
-        return 0.0;
-    }
+        // 2. Fallback to OSHI
+        if (initOshi()) {
+            try {
+                Object hardware = oshiSystemInfo.getClass().getMethod("getHardware").invoke(oshiSystemInfo);
+                List<?> netIFs = (List<?>) hardware.getClass().getMethod("getNetworkIFs").invoke(hardware);
+                if (netIFs != null) {
+                    long totalRx = 0;
+                    long totalTx = 0;
+                    for (Object net : netIFs) {
+                        net.getClass().getMethod("updateAttributes").invoke(net);
+                        long rx = (long) net.getClass().getMethod("getBytesRecv").invoke(net);
+                        long tx = (long) net.getClass().getMethod("getBytesSent").invoke(net);
+                        totalRx += rx;
+                        totalTx += tx;
+                    }
 
-    public static void updateNetworkSpeeds() {
-        if (!initOshi()) {
-            return;
+                    if (prevNetTimeMs > 0 && now > prevNetTimeMs && prevRxBytes >= 0 && prevTxBytes >= 0) {
+                        long durationMs = now - prevNetTimeMs;
+                        long rxDiff = Math.max(0L, totalRx - prevRxBytes);
+                        long txDiff = Math.max(0L, totalTx - prevTxBytes);
+                        curDlSpeed = (rxDiff * 1000L) / durationMs;
+                        curUlSpeed = (txDiff * 1000L) / durationMs;
+                    }
+
+                    prevNetTimeMs = now;
+                    prevRxBytes = totalRx;
+                    prevTxBytes = totalTx;
+                }
+            } catch (Throwable ignored) {}
         }
-        try {
-            long now = System.currentTimeMillis();
-            Object hardware = oshiSystemInfo.getClass().getMethod("getHardware").invoke(oshiSystemInfo);
-            List<?> netIFs = (List<?>) hardware.getClass().getMethod("getNetworkIFs").invoke(hardware);
-            if (netIFs == null) return;
-
-            long totalRx = 0;
-            long totalTx = 0;
-            for (Object net : netIFs) {
-                net.getClass().getMethod("updateAttributes").invoke(net);
-                long rx = (long) net.getClass().getMethod("getBytesRecv").invoke(net);
-                long tx = (long) net.getClass().getMethod("getBytesSent").invoke(net);
-                totalRx += rx;
-                totalTx += tx;
-            }
-
-            if (prevNetTimeMs > 0 && now > prevNetTimeMs && prevRxBytes >= 0 && prevTxBytes >= 0) {
-                long durationMs = now - prevNetTimeMs;
-                long rxDiff = Math.max(0L, totalRx - prevRxBytes);
-                long txDiff = Math.max(0L, totalTx - prevTxBytes);
-                curDlSpeed = (rxDiff * 1000L) / durationMs;
-                curUlSpeed = (txDiff * 1000L) / durationMs;
-            }
-
-            prevNetTimeMs = now;
-            prevRxBytes = totalRx;
-            prevTxBytes = totalTx;
-        } catch (Throwable ignored) {}
     }
 
     public static ServerHardwareStats collect(MinecraftServer server) {
@@ -214,13 +360,13 @@ public class ServerHardwareCollector {
             }
         } catch (Throwable ignored) {}
 
-        double cpu = getCpuUsage();
+        int cores = getContainerAllocatedCores();
+        int maxCpuPercent = cores * 100;
+        double cpu = getProcessCpuUsage(cores);
 
-        Runtime rt = Runtime.getRuntime();
-        long totalRam = rt.totalMemory();
-        long freeRam = rt.freeMemory();
-        long usedRam = totalRam - freeRam;
-        long maxRam = rt.maxMemory();
+        long[] mem = getContainerMemory();
+        long usedRam = mem[0];
+        long maxRam = mem[1];
 
         long uptimeSec = 0;
         try {
@@ -230,8 +376,11 @@ public class ServerHardwareCollector {
         updateNetworkSpeeds();
 
         boolean c2me = isC2meOpenclLoaded();
+        boolean dh = isDhLoaded();
+        boolean seedGen = isSeedGenLoaded();
         String gpu = getGpuName();
 
-        return new ServerHardwareStats(tps, mspt, cpu, usedRam, maxRam, uptimeSec, curDlSpeed, curUlSpeed, c2me, gpu);
+        return new ServerHardwareStats(tps, mspt, cpu, maxCpuPercent, usedRam, maxRam, uptimeSec,
+                curDlSpeed, curUlSpeed, c2me, dh, seedGen, gpu);
     }
 }

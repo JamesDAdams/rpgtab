@@ -34,11 +34,11 @@ Un remplacement soigné et hautement personnalisable de la liste des joueurs (me
   - **FPS Client** : Compteur de FPS en temps réel en haut à droite du menu TAB, compatible avec **NeoForge GGTU (Resolution Scaler)** pour afficher les FPS réels et les frames générées.
 - **Métriques Matérielles & Réseau du Serveur (Footer)** :
   - Affichage en temps réel des **TPS & MSPT** avec indicateurs de couleur.
-  - Utilisation du **CPU** du serveur avec icône 🖥.
-  - Consommation **RAM** utilisée et maximale avec icône 💾.
-  - Débit **Réseau** en temps réel avec 🌐 Net: ↓ DL ↑ UL.
+  - Utilisation du **CPU** du serveur rapportée au nombre de cœurs alloués au conteneur (ex: `200%/600%`).
+  - Consommation **RAM** conteneur et JVM (ex: `1.7 Go / 16.0 Go`).
+  - Débit **Réseau** conteneur en temps réel (via `/proc/net/dev`, DL et UL en Ko/s ou Mo/s).
   - **Uptime** du serveur depuis le dernier reboot (⏱ Up:).
-  - **Détection GPU & C2ME OpenCL** : Détection du GPU par multi-niveau (C2ME OpenCL, procfs NVIDIA, OSHI) et état d'accélération C2ME OpenCL.
+  - **Détection GPU, C2ME OpenCL, Distant Horizons & SeedGen** : Affiche le nom du GPU, l'accélération C2ME OpenCL ainsi que le statut Distant Horizons et SeedGen.
   - Options activables/désactivables individuellement dans `config/rpgtab-server.toml` (`[server_metrics]`).
 
 ### 📂 Structure du Projet
@@ -65,4 +65,4 @@ Nécessite Java 21 LTS (OpenJDK ou Zulu) :
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.10.0-neoforge-1.21.1.jar`.
+Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.11.0-neoforge-1.21.1.jar`.

@@ -34,11 +34,11 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
   - **Client FPS**: Real-time FPS counter in the top-right corner of the TAB menu, fully compatible with **NeoForge GGTU (Resolution Scaler)** frame generation (displays total FPS, real frames, and generated frames).
 - **Server Hardware & Network Metrics (Footer)**:
   - Real-time **TPS & MSPT** display with color indicators.
-  - Server **CPU usage** percentage with 🖥 icon.
-  - Allocated & max **RAM** usage with 💾 icon.
-  - Real-time **Network transfer rates** with 🌐 Net: ↓ DL ↑ UL.
+  - Server **CPU usage** percentage formatted against container allocated cores (e.g. `200%/600%`).
+  - Allocated & container cgroup **RAM** usage (e.g. `1.7 Go / 16.0 Go`).
+  - Container-level **Network transfer rates** (DL and UL in Ko/s or Mo/s via `/proc/net/dev`).
   - Server **Uptime** since last reboot (⏱ Up:).
-  - **GPU & C2ME OpenCL detection**: Displays the connected GPU name via multi-level OpenCL/procfs/OSHI fallback and C2ME OpenCL Acceleration Module status.
+  - **GPU, C2ME OpenCL, Distant Horizons & SeedGen detection**: Displays the connected GPU name, C2ME OpenCL status, and Distant Horizons / SeedGen integration status.
   - Configurable server toggles in `config/rpgtab-server.toml` (`[server_metrics]`).
 
 ### 📂 Project Structure
@@ -65,4 +65,4 @@ Requires Java 21 LTS (OpenJDK or Zulu):
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-The compiled JAR will be output to `build/` as `rpgtab-1.10.0-neoforge-1.21.1.jar`.
+The compiled JAR will be output to `build/` as `rpgtab-1.11.0-neoforge-1.21.1.jar`.

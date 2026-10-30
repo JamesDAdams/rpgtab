@@ -249,7 +249,7 @@ public class RpgTabRenderer {
             parts.add(String.format("§e⚙ TPS: §f%.1f §7(%.1fms)", stats.getTps(), stats.getMspt()));
         }
         if (cfg.showServerCpu) {
-            parts.add(String.format("§b🖥 CPU: §f%.0f%%", stats.getCpuUsage()));
+            parts.add("§b🖥 CPU: §f" + stats.getFormattedCpu());
         }
         if (cfg.showServerRam) {
             parts.add(String.format("§a💾 RAM: §f%s/%s", com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()),
@@ -270,27 +270,31 @@ public class RpgTabRenderer {
             graphics.drawString(font, line1, startX + (totalWidth - line1W) / 2, footerY + 4, 0xFFE0E0E0, false);
         }
 
-        // Ligne 2 : GPU et C2ME OpenCL Acceleration Module
+        // Ligne 2 : GPU, C2ME OpenCL, Distant Horizons & SeedGen
+        StringBuilder line2Sb = new StringBuilder();
         if (cfg.showServerGpu) {
             String gpuName = stats.getGpuName();
-            boolean c2me = stats.isC2meOpenclLoaded();
-            if (!gpuName.isEmpty() || c2me) {
-                StringBuilder gpuSb = new StringBuilder();
-                if (!gpuName.isEmpty() && !gpuName.equalsIgnoreCase("unknown")) {
-                    gpuSb.append("§3⚡ GPU: §f").append(gpuName);
-                }
-                if (c2me) {
-                    if (gpuSb.length() > 0) {
-                        gpuSb.append(" §8| ");
-                    }
-                    gpuSb.append("§2✔ C2ME OpenCL: §aActif");
-                }
-                String line2 = gpuSb.toString();
-                if (!line2.isEmpty()) {
-                    int line2W = font.width(line2);
-                    graphics.drawString(font, line2, startX + (totalWidth - line2W) / 2, footerY + 16, 0xFFE0E0E0, false);
-                }
+            if (!gpuName.isEmpty() && !gpuName.equalsIgnoreCase("unknown")) {
+                line2Sb.append("§3⚡ GPU: §f").append(gpuName);
             }
+            if (stats.isC2meOpenclLoaded()) {
+                if (line2Sb.length() > 0) line2Sb.append(" §8| ");
+                line2Sb.append("§2✔ C2ME OpenCL: §aActif");
+            }
+        }
+        if (cfg.showServerDh && stats.isDhLoaded()) {
+            if (line2Sb.length() > 0) line2Sb.append(" §8| ");
+            line2Sb.append("§b🌌 DH: §aActif");
+        }
+        if (cfg.showServerSeedGen && stats.isSeedGenLoaded()) {
+            if (line2Sb.length() > 0) line2Sb.append(" §8| ");
+            line2Sb.append("§e🌱 SeedGen: §aActif");
+        }
+
+        String line2 = line2Sb.toString();
+        if (!line2.isEmpty()) {
+            int line2W = font.width(line2);
+            graphics.drawString(font, line2, startX + (totalWidth - line2W) / 2, footerY + 16, 0xFFE0E0E0, false);
         }
     }
 

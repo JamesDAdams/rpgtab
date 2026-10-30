@@ -39,6 +39,8 @@ public class RpgTabServerConfig {
     public final ModConfigSpec.BooleanValue showServerUptime;
     public final ModConfigSpec.BooleanValue showServerNetwork;
     public final ModConfigSpec.BooleanValue showServerGpu;
+    public final ModConfigSpec.BooleanValue showServerDh;
+    public final ModConfigSpec.BooleanValue showServerSeedGen;
 
     // Couleurs configurables (Format hex ARGB ou RGB, ex: "#FFE5A93C" ou "0xFFE5A93C")
     public final ModConfigSpec.ConfigValue<String> healthColor;
@@ -80,6 +82,8 @@ public class RpgTabServerConfig {
         showServerUptime = builder.comment("Afficher le temps de fonctionnement (uptime) du serveur depuis le reboot").define("showServerUptime", true);
         showServerNetwork = builder.comment("Afficher le debit reseau du serveur (DL et UL)").define("showServerNetwork", true);
         showServerGpu = builder.comment("Afficher le GPU du serveur et l'etat d'acceleration C2ME OpenCL").define("showServerGpu", true);
+        showServerDh = builder.comment("Afficher le statut Distant Horizons cote serveur").define("showServerDh", true);
+        showServerSeedGen = builder.comment("Afficher le statut SeedGen cote serveur").define("showServerSeedGen", true);
         builder.pop();
 
         builder.push("colors");
