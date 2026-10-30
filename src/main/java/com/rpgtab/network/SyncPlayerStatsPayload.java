@@ -2,6 +2,7 @@ package com.rpgtab.network;
 
 import com.rpgtab.RpgTabConstants;
 import com.rpgtab.config.RpgTabConfigData;
+import com.rpgtab.server.ServerHardwareStats;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +11,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record SyncPlayerStatsPayload(RpgTabConfigData config, List<PlayerStatsEntry> entries) implements CustomPacketPayload {
+public record SyncPlayerStatsPayload(RpgTabConfigData config, List<PlayerStatsEntry> entries, ServerHardwareStats serverStats) implements CustomPacketPayload {
 
     public static final Type<SyncPlayerStatsPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(RpgTabConstants.MODID, "sync_player_stats"));
 
@@ -36,6 +37,12 @@ public record SyncPlayerStatsPayload(RpgTabConfigData config, List<PlayerStatsEn
         for (int i = 0; i < safeSize; i++) {
             safeEntries.get(i).write(buf);
         }
+        if (serverStats != null) {
+            buf.writeBoolean(true);
+            serverStats.write(buf);
+        } else {
+            buf.writeBoolean(false);
+        }
     }
 
     public static SyncPlayerStatsPayload read(RegistryFriendlyByteBuf buf) {
@@ -48,6 +55,10 @@ public record SyncPlayerStatsPayload(RpgTabConfigData config, List<PlayerStatsEn
         for (int i = 0; i < count; i++) {
             list.add(PlayerStatsEntry.read(buf));
         }
-        return new SyncPlayerStatsPayload(config, list);
+        ServerHardwareStats stats = null;
+        if (buf.readBoolean()) {
+            stats = ServerHardwareStats.read(buf);
+        }
+        return new SyncPlayerStatsPayload(config, list, stats);
     }
 }

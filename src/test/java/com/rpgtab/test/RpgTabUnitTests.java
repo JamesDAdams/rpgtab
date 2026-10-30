@@ -20,6 +20,7 @@ public class RpgTabUnitTests {
         testConfigDataParsing();
         testConfigDataDefaultValues();
         testSyncPlayerStatsPayloadEdgeCases();
+        testServerHardwareStats();
         System.out.println("ALL RPG TAB TESTS PASSED!");
     }
 
@@ -246,6 +247,10 @@ public class RpgTabUnitTests {
         if (data.playTimeColor != RpgTabConstants.DEFAULT_PLAYTIME_COLOR) {
             throw new AssertionError("Default playTimeColor mismatch");
         }
+        if (!data.showServerFooter || !data.showServerTps || !data.showServerCpu || !data.showServerRam
+                || !data.showServerUptime || !data.showServerNetwork || !data.showServerGpu) {
+            throw new AssertionError("Default server metrics flags mismatch");
+        }
         System.out.println("[PASS] RpgTabConfigData default values tests");
     }
 
@@ -258,5 +263,41 @@ public class RpgTabUnitTests {
             throw new AssertionError("List creation failed");
         }
         System.out.println("[PASS] SyncPlayerStatsPayload edge cases tests");
+    }
+
+    private static void testServerHardwareStats() {
+        com.rpgtab.server.ServerHardwareStats stats = new com.rpgtab.server.ServerHardwareStats(
+                19.8f, 15.2f, 35.5, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
+                90000L, 2500000L, 500000L, true, "NVIDIA GeForce RTX 4070"
+        );
+        if (stats.getTps() != 19.8f || stats.getMspt() != 15.2f) {
+            throw new AssertionError("TPS/MSPT mismatch");
+        }
+        if (stats.getCpuUsage() != 35.5) {
+            throw new AssertionError("CPU mismatch");
+        }
+        if (!"1d 1h 0m".equals(stats.getFormattedUptime())) {
+            throw new AssertionError("Uptime mismatch: " + stats.getFormattedUptime());
+        }
+        if (!"NVIDIA GeForce RTX 4070".equals(stats.getGpuName())) {
+            throw new AssertionError("GPU Name mismatch");
+        }
+        if (!stats.isC2meOpenclLoaded()) {
+            throw new AssertionError("C2ME OpenCL flag mismatch");
+        }
+        if (!"2.4 Mo/s".equals(com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getDownloadBytesPerSec()))) {
+            throw new AssertionError("Speed format mismatch: " + com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getDownloadBytesPerSec()));
+        }
+        if (!"4.0 Go".equals(com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()))) {
+            throw new AssertionError("RAM format mismatch: " + com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()));
+        }
+
+        // Test client cache storage
+        ClientStatsCache.setServerStats(stats);
+        if (ClientStatsCache.getServerStats() == null || !ClientStatsCache.getServerStats().getGpuName().equals("NVIDIA GeForce RTX 4070")) {
+            throw new AssertionError("Failed to store ServerHardwareStats in ClientStatsCache");
+        }
+
+        System.out.println("[PASS] ServerHardwareStats tests");
     }
 }

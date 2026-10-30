@@ -167,7 +167,8 @@ public class ServerStatsCollector {
             }
         }
 
-        SyncPlayerStatsPayload payload = new SyncPlayerStatsPayload(config, entries);
+        ServerHardwareStats serverStats = ServerHardwareCollector.collect(server);
+        SyncPlayerStatsPayload payload = new SyncPlayerStatsPayload(config, entries, serverStats);
         PacketDistributor.sendToAllPlayers(payload);
     }
 }

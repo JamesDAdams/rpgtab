@@ -28,6 +28,7 @@ public class RpgTabMod {
                 SyncPlayerStatsPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> {
                     ClientStatsCache.setConfig(payload.config());
+                    ClientStatsCache.setServerStats(payload.serverStats());
                     for (PlayerStatsEntry entry : payload.entries()) {
                         ClientStatsCache.update(entry);
                     }

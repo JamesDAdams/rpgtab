@@ -30,6 +30,15 @@ public class RpgTabServerConfig {
     public final ModConfigSpec.BooleanValue showPlayTime;
     public final ModConfigSpec.BooleanValue showPing;
 
+    // Métriques serveur (Footer)
+    public final ModConfigSpec.BooleanValue showServerFooter;
+    public final ModConfigSpec.BooleanValue showServerCpu;
+    public final ModConfigSpec.BooleanValue showServerRam;
+    public final ModConfigSpec.BooleanValue showServerTps;
+    public final ModConfigSpec.BooleanValue showServerUptime;
+    public final ModConfigSpec.BooleanValue showServerNetwork;
+    public final ModConfigSpec.BooleanValue showServerGpu;
+
     // Couleurs configurables (Format hex ARGB ou RGB, ex: "#FFE5A93C" ou "0xFFE5A93C")
     public final ModConfigSpec.ConfigValue<String> healthColor;
     public final ModConfigSpec.ConfigValue<String> foodColor;
@@ -59,6 +68,16 @@ public class RpgTabServerConfig {
         showAdvancements = builder.comment("Afficher les progres/advancements termines").define("showAdvancements", true);
         showPlayTime = builder.comment("Afficher le temps de jeu sur le serveur").define("showPlayTime", true);
         showPing = builder.comment("Afficher le ping / latence").define("showPing", true);
+        builder.pop();
+
+        builder.push("server_metrics");
+        showServerFooter = builder.comment("Activer le bandeau de statistiques du serveur en bas du TAB").define("showServerFooter", true);
+        showServerTps = builder.comment("Afficher les TPS et MSPT du serveur").define("showServerTps", true);
+        showServerCpu = builder.comment("Afficher le pourcentage CPU du serveur").define("showServerCpu", true);
+        showServerRam = builder.comment("Afficher l'utilisation de la RAM du serveur").define("showServerRam", true);
+        showServerUptime = builder.comment("Afficher le temps de fonctionnement (uptime) du serveur depuis le reboot").define("showServerUptime", true);
+        showServerNetwork = builder.comment("Afficher le debit reseau du serveur (DL et UL)").define("showServerNetwork", true);
+        showServerGpu = builder.comment("Afficher le GPU du serveur et l'etat d'acceleration C2ME OpenCL").define("showServerGpu", true);
         builder.pop();
 
         builder.push("colors");

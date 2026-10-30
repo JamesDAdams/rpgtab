@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientStatsCache {
     private static final Map<UUID, PlayerStatsEntry> CACHE = new ConcurrentHashMap<>();
     private static RpgTabConfigData currentConfig = new RpgTabConfigData();
+    private static com.rpgtab.server.ServerHardwareStats currentServerStats = null;
 
     public static void setConfig(RpgTabConfigData config) {
         if (config != null) {
@@ -19,6 +20,14 @@ public class ClientStatsCache {
 
     public static RpgTabConfigData getConfig() {
         return currentConfig;
+    }
+
+    public static void setServerStats(com.rpgtab.server.ServerHardwareStats stats) {
+        currentServerStats = stats;
+    }
+
+    public static com.rpgtab.server.ServerHardwareStats getServerStats() {
+        return currentServerStats;
     }
 
     public static void update(PlayerStatsEntry entry) {

@@ -30,6 +30,14 @@ Un remplacement soigné et hautement personnalisable de la liste des joueurs (me
   - Activation ou désactivation de chaque colonne au choix.
   - Personnalisation du titre et des couleurs en hexadécimal (`0xRRGGBB` ou `#RRGGBB`).
   - Option d'affichage des joueurs hors ligne (activée par défaut).
+- **Métriques Matérielles & Réseau du Serveur (Footer)** :
+  - Affichage en temps réel des **TPS & MSPT** avec indicateurs de couleur.
+  - Utilisation du **CPU** du serveur en pourcentage.
+  - Consommation **RAM** utilisée et maximale (ex: `4.2 / 16.0 Go`).
+  - Débit **Réseau** en temps réel (Download et Upload en Ko/s ou Mo/s).
+  - **Uptime** du serveur depuis le dernier reboot.
+  - **Détection GPU & C2ME OpenCL** : Affiche le nom du GPU connecté et l'état d'accélération C2ME OpenCL.
+  - Options activables/désactivables individuellement dans `config/rpgtab-server.toml` (`[server_metrics]`).
 
 ### 📂 Structure du Projet
 ```
@@ -55,4 +63,4 @@ Nécessite Java 21 LTS (OpenJDK ou Zulu) :
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.8.1-neoforge-1.21.1.jar`.
+Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.9.0-neoforge-1.21.1.jar`.

@@ -19,6 +19,15 @@ public class RpgTabConfigData {
     public boolean showPlayTime = true;
     public boolean showPing = true;
 
+    // Métriques serveur (Footer)
+    public boolean showServerFooter = true;
+    public boolean showServerTps = true;
+    public boolean showServerCpu = true;
+    public boolean showServerRam = true;
+    public boolean showServerUptime = true;
+    public boolean showServerNetwork = true;
+    public boolean showServerGpu = true;
+
     public int healthColor = RpgTabConstants.DEFAULT_HEALTH_COLOR;
     public int foodColor = RpgTabConstants.DEFAULT_FOOD_COLOR;
     public int xpColor = RpgTabConstants.DEFAULT_XP_COLOR;
@@ -65,6 +74,14 @@ public class RpgTabConfigData {
         data.showPlayTime = RpgTabServerConfig.CONFIG.showPlayTime.get();
         data.showPing = RpgTabServerConfig.CONFIG.showPing.get();
 
+        data.showServerFooter = RpgTabServerConfig.CONFIG.showServerFooter.get();
+        data.showServerTps = RpgTabServerConfig.CONFIG.showServerTps.get();
+        data.showServerCpu = RpgTabServerConfig.CONFIG.showServerCpu.get();
+        data.showServerRam = RpgTabServerConfig.CONFIG.showServerRam.get();
+        data.showServerUptime = RpgTabServerConfig.CONFIG.showServerUptime.get();
+        data.showServerNetwork = RpgTabServerConfig.CONFIG.showServerNetwork.get();
+        data.showServerGpu = RpgTabServerConfig.CONFIG.showServerGpu.get();
+
         data.healthColor = parseColor(RpgTabServerConfig.CONFIG.healthColor.get(), RpgTabConstants.DEFAULT_HEALTH_COLOR);
         data.foodColor = parseColor(RpgTabServerConfig.CONFIG.foodColor.get(), RpgTabConstants.DEFAULT_FOOD_COLOR);
         data.xpColor = parseColor(RpgTabServerConfig.CONFIG.xpColor.get(), RpgTabConstants.DEFAULT_XP_COLOR);
@@ -91,6 +108,14 @@ public class RpgTabConfigData {
         buf.writeBoolean(showPlayTime);
         buf.writeBoolean(showPing);
 
+        buf.writeBoolean(showServerFooter);
+        buf.writeBoolean(showServerTps);
+        buf.writeBoolean(showServerCpu);
+        buf.writeBoolean(showServerRam);
+        buf.writeBoolean(showServerUptime);
+        buf.writeBoolean(showServerNetwork);
+        buf.writeBoolean(showServerGpu);
+
         buf.writeInt(healthColor);
         buf.writeInt(foodColor);
         buf.writeInt(xpColor);
@@ -115,6 +140,14 @@ public class RpgTabConfigData {
         data.showAdvancements = buf.readBoolean();
         data.showPlayTime = buf.readBoolean();
         data.showPing = buf.readBoolean();
+
+        data.showServerFooter = buf.readBoolean();
+        data.showServerTps = buf.readBoolean();
+        data.showServerCpu = buf.readBoolean();
+        data.showServerRam = buf.readBoolean();
+        data.showServerUptime = buf.readBoolean();
+        data.showServerNetwork = buf.readBoolean();
+        data.showServerGpu = buf.readBoolean();
 
         data.healthColor = buf.readInt();
         data.foodColor = buf.readInt();

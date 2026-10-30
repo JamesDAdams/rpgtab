@@ -122,7 +122,10 @@ public class RpgTabRenderer {
 
         int maxRows = Math.min(displayList.size(), 14);
         int rowsHeight = maxRows * ROW_HEIGHT;
-        int totalHeight = HEADER_HEIGHT + rowsHeight + FOOTER_HEIGHT;
+        com.rpgtab.server.ServerHardwareStats serverStats = ClientStatsCache.getServerStats();
+        boolean hasFooterMetrics = cfg.showServerFooter && serverStats != null;
+        int footerHeight = hasFooterMetrics ? (serverStats.getGpuName().isEmpty() && !serverStats.isC2meOpenclLoaded() ? 24 : 36) : FOOTER_HEIGHT;
+        int totalHeight = HEADER_HEIGHT + rowsHeight + footerHeight;
 
         int startX = (screenWidth - totalWidth) / 2;
         int startY = 16;
@@ -216,11 +219,70 @@ public class RpgTabRenderer {
         if (displayList.size() > maxRows) {
             String more = "+" + (displayList.size() - maxRows) + " more adventurers...";
             graphics.drawString(font, more, startX + (totalWidth - font.width(more)) / 2, rowY + 3, 0xFF888888, false);
+            rowY += 12;
+        }
+
+        // 5. Bandeau Statistiques Serveur (Footer)
+        if (hasFooterMetrics) {
+            renderServerFooter(graphics, font, serverStats, cfg, startX, rowY + 2, totalWidth);
         }
 
         graphics.flush();
         RenderSystem.enableDepthTest();
         graphics.pose().popPose();
+    }
+
+    private static void renderServerFooter(GuiGraphics graphics, Font font, com.rpgtab.server.ServerHardwareStats stats,
+                                           RpgTabConfigData cfg, int startX, int footerY, int totalWidth) {
+        // Ligne de séparation au dessus du footer
+        graphics.fill(startX + 8, footerY, startX + totalWidth - 8, footerY + 1, 0x33FFFFFF);
+
+        List<String> parts = new ArrayList<>();
+        if (cfg.showServerTps) {
+            parts.add(String.format("§e⚙ TPS: §f%.1f §7(%.1fms)", stats.getTps(), stats.getMspt()));
+        }
+        if (cfg.showServerCpu) {
+            parts.add(String.format("§bCPU: §f%.0f%%", stats.getCpuUsage()));
+        }
+        if (cfg.showServerRam) {
+            parts.add(String.format("§aRAM: §f%s/%s", com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()),
+                    com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getMaxRamBytes())));
+        }
+        if (cfg.showServerNetwork) {
+            parts.add(String.format("§d↓ §f%s §d↑ §f%s",
+                    com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getDownloadBytesPerSec()),
+                    com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getUploadBytesPerSec())));
+        }
+        if (cfg.showServerUptime) {
+            parts.add("§6⏱ Up: §f" + stats.getFormattedUptime());
+        }
+
+        String line1 = String.join(" §8| ", parts);
+        if (!line1.isEmpty()) {
+            int line1W = font.width(line1);
+            graphics.drawString(font, line1, startX + (totalWidth - line1W) / 2, footerY + 4, 0xFFE0E0E0, false);
+        }
+
+        // Ligne 2 : GPU et C2ME OpenCL Acceleration Module
+        if (cfg.showServerGpu) {
+            String gpuName = stats.getGpuName();
+            boolean c2me = stats.isC2meOpenclLoaded();
+            if (!gpuName.isEmpty() || c2me) {
+                StringBuilder gpuSb = new StringBuilder();
+                if (!gpuName.isEmpty()) {
+                    gpuSb.append("§3⚡ GPU: §f").append(gpuName);
+                }
+                if (c2me) {
+                    if (gpuSb.length() > 0) {
+                        gpuSb.append(" §8| ");
+                    }
+                    gpuSb.append("§2✔ C2ME OpenCL: §aActif");
+                }
+                String line2 = gpuSb.toString();
+                int line2W = font.width(line2);
+                graphics.drawString(font, line2, startX + (totalWidth - line2W) / 2, footerY + 16, 0xFFE0E0E0, false);
+            }
+        }
     }
 
     private static void renderPlayerRow(GuiGraphics graphics, Font font, PlayerStatsEntry entry, PlayerInfo info,
