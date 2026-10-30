@@ -8,6 +8,7 @@ version="1.33.0"
 displayName="RPG Tab Overlay"
 description='RPG-styled TAB menu displaying player health, food, XP, deaths, ping, FTB quests and advancements.'
 authors="Antigravity"
+logoFile="icon.png"
 
 [[dependencies.rpgtab]]
 modId="neoforge"
