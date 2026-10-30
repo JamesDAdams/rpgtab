@@ -101,7 +101,7 @@ public class RpgTabServerConfig {
                 "Pelican Client API Key (Account Settings -> API Credentials / Tokens).\n" +
                 "Required permission: 'server.resources' (Read resources / Read server metrics / WebSocket connection)."
         ).define("pelicanApiKey", "");
-        pelicanServerId = builder.comment("Short server identifier on Pelican (e.g. 39de0ded)").define("pelicanServerId", "");
+        pelicanServerId = builder.comment("Short server identifier on Pelican (e.g. 8a3f1b2c)").define("pelicanServerId", "");
         builder.pop();
 
         builder.push("colors");
