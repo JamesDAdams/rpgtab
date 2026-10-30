@@ -72,9 +72,9 @@ public class ServerHardwareCollector {
                 boolean loaded = ModList.get().isLoaded("seedrenderer") || ModList.get().isLoaded("seedgen");
                 if (loaded) {
                     try {
-                        Class<?> clientWg = Class.forName("mobius.seedrenderer.dh.ClientWorldgen");
-                        boolean fellBack = (boolean) clientWg.getMethod("fellBack").invoke(null);
-                        if (fellBack) {
+                        Class<?> compatClass = Class.forName("mobius.seedrenderer.compat.WorldgenCompat");
+                        List<?> reasons = (List<?>) compatClass.getMethod("standDownReasons").invoke(null);
+                        if (reasons != null && !reasons.isEmpty()) {
                             cachedSeedGenLoaded = false;
                             return false;
                         }

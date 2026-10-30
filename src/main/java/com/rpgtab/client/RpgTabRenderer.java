@@ -27,18 +27,18 @@ public class RpgTabRenderer {
     private static final int FOOTER_HEIGHT = 16;
     private static final int PADDING_X = 14;
 
-    private static final int COL_AVATAR = 24;
-    private static final int COL_NAME = 120;
-    private static final int COL_HEALTH = 115;
-    private static final int COL_FOOD = 70;
-    private static final int COL_XP = 60;
-    private static final int COL_DEATHS = 55;
-    private static final int COL_QUESTS = 65;
-    private static final int COL_ADV = 60;
-    private static final int COL_PLAYTIME = 65;
-    private static final int COL_CHUNKS = 50;
-    private static final int COL_GEN = 65;
-    private static final int COL_PING = 50;
+    private static final int COL_AVATAR = 22;
+    private static final int COL_NAME = 100;
+    private static final int COL_HEALTH = 95;
+    private static final int COL_FOOD = 55;
+    private static final int COL_XP = 50;
+    private static final int COL_DEATHS = 45;
+    private static final int COL_QUESTS = 48;
+    private static final int COL_ADV = 48;
+    private static final int COL_PLAYTIME = 55;
+    private static final int COL_CHUNKS = 45;
+    private static final int COL_GEN = 48;
+    private static final int COL_PING = 42;
 
     public static void render(GuiGraphics graphics) {
         Minecraft mc = Minecraft.getInstance();
@@ -363,7 +363,7 @@ public class RpgTabRenderer {
         if (cfg.showHealth) {
             float hp = isOnline ? entry.getHealth() : 0.0f;
             float maxHp = Math.max(1.0f, entry.getMaxHealth());
-            int barW = 80;
+            int barW = 70;
             int barH = 12;
             int barX = currX + 4;
             int barY = y + 6;

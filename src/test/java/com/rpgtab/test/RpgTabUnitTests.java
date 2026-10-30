@@ -224,9 +224,11 @@ public class RpgTabUnitTests {
 
     private static void testConfigDataDefaultValues() {
         RpgTabConfigData data = new RpgTabConfigData();
-        if (!data.showOfflinePlayers || !data.showPlayTime || !data.showHealth || !data.showFps
-                || !data.showLoadedChunks || !data.showGeneratingChunks) {
+        if (!data.showOfflinePlayers || !data.showPlayTime || !data.showHealth || !data.showFps) {
             throw new AssertionError("Default config values mismatch");
+        }
+        if (data.showLoadedChunks || data.showGeneratingChunks) {
+            throw new AssertionError("Chunk columns should be disabled by default to save width");
         }
         if (data.titleColor != RpgTabConstants.DEFAULT_TITLE_COLOR) {
             throw new AssertionError("Default titleColor mismatch");

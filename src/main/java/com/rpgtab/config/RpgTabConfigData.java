@@ -19,8 +19,8 @@ public class RpgTabConfigData {
     public boolean showPlayTime = true;
     public boolean showPing = true;
     public boolean showFps = true;
-    public boolean showLoadedChunks = true;
-    public boolean showGeneratingChunks = true;
+    public boolean showLoadedChunks = false;
+    public boolean showGeneratingChunks = false;
 
     // Métriques serveur (Footer)
     public boolean showServerFooter = true;
