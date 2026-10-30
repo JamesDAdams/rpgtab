@@ -32,7 +32,6 @@ public class PelicanApiHelper {
 
     public static long[] getContainerSwapStats() {
         // [swapUsedBytes, swapLimitBytes]
-        // 1. Try cgroup v2: /sys/fs/cgroup/memory.swap.current and /sys/fs/cgroup/memory.swap.max
         try {
             File curFile = new File("/sys/fs/cgroup/memory.swap.current");
             File maxFile = new File("/sys/fs/cgroup/memory.swap.max");
@@ -49,7 +48,6 @@ public class PelicanApiHelper {
             }
         } catch (Throwable ignored) {}
 
-        // 2. Try cgroup v1: memory.memsw.usage_in_bytes - memory.usage_in_bytes
         try {
             File memswFile = new File("/sys/fs/cgroup/memory/memory.memsw.usage_in_bytes");
             File memFile = new File("/sys/fs/cgroup/memory/memory.usage_in_bytes");
@@ -131,6 +129,29 @@ public class PelicanApiHelper {
                             if (limits.has("swap")) {
                                 swapLimit = limits.get("swap").getAsLong() * 1024L * 1024L;
                             }
+                        }
+
+                        // Also fetch server details to get swap limit if not in resources endpoint
+                        if (swapLimit <= 0) {
+                            try {
+                                String serverDetailUrl = baseUrl + "/api/client/servers/" + serverId.trim();
+                                HttpRequest detailReq = HttpRequest.newBuilder()
+                                        .uri(URI.create(serverDetailUrl))
+                                        .header("Authorization", "Bearer " + apiKey.trim())
+                                        .header("Accept", "application/json")
+                                        .timeout(Duration.ofMillis(1200))
+                                        .GET()
+                                        .build();
+                                HttpResponse<String> detailResp = HTTP_CLIENT.send(detailReq, HttpResponse.BodyHandlers.ofString());
+                                if (detailResp.statusCode() == 200) {
+                                    JsonObject dRoot = JsonParser.parseString(detailResp.body()).getAsJsonObject();
+                                    JsonObject dAttrs = dRoot.getAsJsonObject("attributes");
+                                    JsonObject dLimits = dAttrs.getAsJsonObject("limits");
+                                    if (dLimits != null && dLimits.has("swap")) {
+                                        swapLimit = dLimits.get("swap").getAsLong() * 1024L * 1024L;
+                                    }
+                                }
+                            } catch (Throwable ignored) {}
                         }
 
                         long[] cgroupSwap = getContainerSwapStats();

@@ -25,6 +25,17 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
   - **Advancements**: Unlocked achievements count (crafting recipes are filtered out).
   - **Server Play Time**: Formatted total playtime (e.g., `2h 15m`).
   - **Latency / Ping**: Color-coded ping in milliseconds.
+- **Client & Performance**:
+  - **Client FPS**: Real-time FPS counter in the top-right corner of the TAB menu, fully compatible with **NeoForge GGTU (Resolution Scaler)** frame generation (displays total FPS, real frames, and generated frames).
+- **Server Hardware & Network Metrics (Footer)**:
+  - Real-time **TPS & MSPT** display with color indicators.
+  - Server **CPU usage** percentage formatted against container allocated cores (e.g. `77% / 600%`).
+  - **GPU Acceleration**: Displays the GPU load percentage (`⚡ GPU: 0%`).
+  - Allocated & container cgroup **RAM & Swap** usage (e.g. `4.8 Go/16.8 Go (Swap: 0.0 Go/8.0 Go)`).
+  - Real-time **Network throughput & transfer totals** (current speed in Ko/s or Mo/s via `/proc/net/dev` and Pelican).
+  - Real-time **Server Chunks**: Total loaded chunks on the server and real-time generating chunks (Vanilla + Distant Horizons).
+  - Server **Uptime** since last reboot (⏱ Up:).
+  - **C2ME OpenCL, Distant Horizons & SeedGen status**: Live indicators showing whether background chunk generation engines are active.
 - **Offline Players Support**:
   - Displays data for previously connected players who are currently offline (play time, deaths, FTB quests, and JSON advancements).
 - **Server Configuration** (`config/rpgtab-server.toml`):
@@ -32,17 +43,23 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
   - Customizable title text and colors (HEX format `0xRRGGBB` or `#RRGGBB`).
   - Toggle offline player visibility (enabled by default).
   - **Pelican Panel API Integration**: Configure `[pelican_api]` (`pelicanUrl`, `pelicanApiKey`, `pelicanServerId`) to fetch actual real-time container metrics directly from the Pelican panel.
-- **Client & Performance**:
-  - **Client FPS**: Real-time FPS counter in the top-right corner of the TAB menu, fully compatible with **NeoForge GGTU (Resolution Scaler)** frame generation (displays total FPS, real frames, and generated frames).
-- **Server Hardware & Network Metrics (Footer)**:
-  - Real-time **TPS & MSPT** display with color indicators.
-  - Server **CPU usage** percentage formatted against container allocated cores (e.g. `200%/600%`).
-  - Allocated & container cgroup **RAM** usage (e.g. `1.7 Go / 16.0 Go`).
-  - Container-level **Network transfer rates** (DL and UL in Ko/s or Mo/s via `/proc/net/dev`).
-  - Real-time **Server Chunks**: Total loaded chunks on the server and real-time generating chunks (Vanilla + Distant Horizons).
-  - Server **Uptime** since last reboot (⏱ Up:).
-  - **GPU, C2ME OpenCL, Distant Horizons & SeedGen detection**: Displays the connected GPU name, C2ME OpenCL status, and Distant Horizons / SeedGen integration status.
-  - Configurable server toggles in `config/rpgtab-server.toml` (`[server_metrics]`).
+
+---
+
+### 🧩 Compatible Mods & Ecosystem Integrations
+RPG Tab Overlay includes built-in soft compatibility (safe reflection hooks that never crash if the mod is absent) with the following ecosystem mods:
+
+| Mod | Platform | Feature & Integration |
+|---|---|---|
+| **NeoForge GGTU (Resolution Scaler)** | Client | Displays real-time FPS with breakdown of native rendering frames and interpolated/generated frames (e.g. `144 FPS (48 + 96 gen)`). |
+| **FTB Teams** | Server / Client | Automatically detects and formats party team names in italics directly under player usernames. |
+| **FTB Quests** | Server / Client | Displays total team / player completed quest counters in real-time. |
+| **C2ME (OpenCL Acceleration Module)** | Server | Detects GPU acceleration, OpenCL runtime device context, and acceleration status. |
+| **Distant Horizons (DH)** | Client / Server | Displays live Distant Horizons server-side status and tracks LOD chunk generation queues. |
+| **Distant Horizons SeedGen** | Server | Detects SeedGen world generation engine status and validates terrain stand-down conditions. |
+| **Pelican / Pterodactyl Panel** | Server / Hosting | Live HTTP API integration to query real-time CPU quota, container cgroup RAM, container swap, and network I/O. |
+
+---
 
 ### 📂 Project Structure
 ```
@@ -50,11 +67,11 @@ rpgtab/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/rpgtab/
-│   │   │   ├── client/          # GUI rendering and client event listeners
+│   │   │   ├── client/          # GUI rendering, GGTU FPS hook & client listeners
 │   │   │   ├── compat/          # FTB Quests & FTB Teams soft compatibility
 │   │   │   ├── config/          # NeoForge server config specification
 │   │   │   ├── network/         # S2C network synchronization packets
-│   │   │   ├── server/          # Online & offline statistics collectors
+│   │   │   ├── server/          # Hardware probes, Pelican API, chunk collectors
 │   │   │   └── RpgTabMod.java   # Mod entry point
 │   │   └── resources/
 │   │       └── META-INF/neoforge.mods.toml
@@ -68,4 +85,4 @@ Requires Java 21 LTS (OpenJDK or Zulu):
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-The compiled JAR will be output to `build/` as `rpgtab-1.25.0-neoforge-1.21.1.jar`.
+The compiled JAR will be output to `build/` as `rpgtab-1.26.0-neoforge-1.21.1.jar`.
