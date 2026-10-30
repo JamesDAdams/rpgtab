@@ -18,6 +18,7 @@ public class RpgTabConfigData {
     public boolean showAdvancements = true;
     public boolean showPlayTime = true;
     public boolean showPing = true;
+    public boolean showFps = true;
 
     // Métriques serveur (Footer)
     public boolean showServerFooter = true;
@@ -73,6 +74,7 @@ public class RpgTabConfigData {
         data.showAdvancements = RpgTabServerConfig.CONFIG.showAdvancements.get();
         data.showPlayTime = RpgTabServerConfig.CONFIG.showPlayTime.get();
         data.showPing = RpgTabServerConfig.CONFIG.showPing.get();
+        data.showFps = RpgTabServerConfig.CONFIG.showFps.get();
 
         data.showServerFooter = RpgTabServerConfig.CONFIG.showServerFooter.get();
         data.showServerTps = RpgTabServerConfig.CONFIG.showServerTps.get();
@@ -107,6 +109,7 @@ public class RpgTabConfigData {
         buf.writeBoolean(showAdvancements);
         buf.writeBoolean(showPlayTime);
         buf.writeBoolean(showPing);
+        buf.writeBoolean(showFps);
 
         buf.writeBoolean(showServerFooter);
         buf.writeBoolean(showServerTps);
@@ -140,6 +143,7 @@ public class RpgTabConfigData {
         data.showAdvancements = buf.readBoolean();
         data.showPlayTime = buf.readBoolean();
         data.showPing = buf.readBoolean();
+        data.showFps = buf.readBoolean();
 
         data.showServerFooter = buf.readBoolean();
         data.showServerTps = buf.readBoolean();

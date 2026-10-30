@@ -1,6 +1,8 @@
 package com.rpgtab.server;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Files;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.fml.ModList;
@@ -51,25 +53,92 @@ public class ServerHardwareCollector {
         return cachedC2meLoaded;
     }
 
-    public static String getGpuName() {
-        if (cachedGpuName != null) {
-            return cachedGpuName;
-        }
-        if (!initOshi()) {
-            cachedGpuName = "";
-            return cachedGpuName;
-        }
+    public static String getC2MEGpuName() {
         try {
-            Object hardware = oshiSystemInfo.getClass().getMethod("getHardware").invoke(oshiSystemInfo);
-            List<?> gpus = (List<?>) hardware.getClass().getMethod("getGraphicsCards").invoke(hardware);
-            if (gpus != null && !gpus.isEmpty()) {
-                Object primaryGpu = gpus.get(0);
-                String name = (String) primaryGpu.getClass().getMethod("getName").invoke(primaryGpu);
-                cachedGpuName = name != null ? name.trim() : "";
-            } else {
-                cachedGpuName = "";
+            Class<?> locatorClass = Class.forName("com.ishland.c2me.opts.accel.opencl.common.enumeration.OpenCLDeviceLocator");
+            Object devicesObj = locatorClass.getMethod("enumerateAll").invoke(null);
+            if (devicesObj instanceof List<?> list && !list.isEmpty()) {
+                Class<?> utilClass = Class.forName("com.ishland.c2me.opts.accel.opencl.common.util.CLUtil");
+                java.lang.reflect.Method getStringMethod = utilClass.getMethod("getDeviceInfoStringUTF8", long.class, int.class);
+                for (Object meta : list) {
+                    long devicePtr = meta.getClass().getField("devicePtr").getLong(meta);
+                    // 0x102B corresponds to CL_DEVICE_NAME in OpenCL
+                    String name = (String) getStringMethod.invoke(null, devicePtr, 0x102B);
+                    if (name != null && !name.trim().isEmpty() && !name.equalsIgnoreCase("unknown")) {
+                        return name.trim();
+                    }
+                }
             }
-        } catch (Throwable t) {
+        } catch (Throwable ignored) {}
+        return "";
+    }
+
+    public static String getNvidiaProcfsGpuName() {
+        try {
+            File dir = new File("/proc/driver/nvidia/gpus");
+            if (dir.exists() && dir.isDirectory()) {
+                File[] subDirs = dir.listFiles();
+                if (subDirs != null) {
+                    for (File sub : subDirs) {
+                        File info = new File(sub, "information");
+                        if (info.exists() && info.isFile()) {
+                            List<String> lines = Files.readAllLines(info.toPath());
+                            for (String line : lines) {
+                                if (line.toLowerCase().startsWith("model:")) {
+                                    String model = line.substring(line.indexOf(':') + 1).trim();
+                                    if (!model.isEmpty()) {
+                                        return model;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+        return "";
+    }
+
+    public static String getGpuName() {
+        if (cachedGpuName != null && !cachedGpuName.isEmpty() && !cachedGpuName.equalsIgnoreCase("unknown")) {
+            return cachedGpuName;
+        }
+
+        // 1. Try C2ME OpenCL enumeration (most accurate for Minecraft chunk gen)
+        String c2meGpu = getC2MEGpuName();
+        if (!c2meGpu.isEmpty()) {
+            cachedGpuName = c2meGpu;
+            return cachedGpuName;
+        }
+
+        // 2. Try Linux NVIDIA procfs (Pelican/Docker container environment)
+        String procGpu = getNvidiaProcfsGpuName();
+        if (!procGpu.isEmpty()) {
+            cachedGpuName = procGpu;
+            return cachedGpuName;
+        }
+
+        // 3. Try OSHI hardware graphics cards
+        if (initOshi()) {
+            try {
+                Object hardware = oshiSystemInfo.getClass().getMethod("getHardware").invoke(oshiSystemInfo);
+                List<?> gpus = (List<?>) hardware.getClass().getMethod("getGraphicsCards").invoke(hardware);
+                if (gpus != null && !gpus.isEmpty()) {
+                    for (Object gpuObj : gpus) {
+                        String name = (String) gpuObj.getClass().getMethod("getName").invoke(gpuObj);
+                        if (name != null && !name.trim().isEmpty() && !name.equalsIgnoreCase("unknown")) {
+                            cachedGpuName = name.trim();
+                            return cachedGpuName;
+                        }
+                    }
+                }
+            } catch (Throwable ignored) {}
+        }
+
+        // Fallback: If C2ME OpenCL is loaded and GPU acceleration is on, indicate OpenCL Device
+        if (isC2meOpenclLoaded()) {
+            cachedGpuName = "OpenCL Acceleration GPU";
+        } else {
             cachedGpuName = "";
         }
         return cachedGpuName;

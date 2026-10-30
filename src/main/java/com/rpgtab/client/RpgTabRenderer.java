@@ -152,6 +152,13 @@ public class RpgTabRenderer {
         int titleW = font.width(title);
         graphics.drawString(font, title, startX + (totalWidth - titleW) / 2, startY + 6, cfg.titleColor, true);
 
+        // Affichage des FPS client en haut a droite (compatible GGTU)
+        if (cfg.showFps) {
+            String fpsStr = GgtuFpsHelper.getFormattedFps();
+            int fpsW = font.width(fpsStr);
+            graphics.drawString(font, fpsStr, startX + totalWidth - fpsW - PADDING_X, startY + 6, 0xFF4ADE80, false);
+        }
+
         long onlineCount = displayList.stream().filter(e -> onlineMap.containsKey(e.getUuid()) || e.isOnline()).count();
         String countStr = onlineCount + " Online" + (cfg.showOfflinePlayers && displayList.size() > onlineCount ? " (" + (displayList.size() - onlineCount) + " Offline)" : "");
         int countW = font.width(countStr);
@@ -242,14 +249,14 @@ public class RpgTabRenderer {
             parts.add(String.format("§e⚙ TPS: §f%.1f §7(%.1fms)", stats.getTps(), stats.getMspt()));
         }
         if (cfg.showServerCpu) {
-            parts.add(String.format("§bCPU: §f%.0f%%", stats.getCpuUsage()));
+            parts.add(String.format("§b🖥 CPU: §f%.0f%%", stats.getCpuUsage()));
         }
         if (cfg.showServerRam) {
-            parts.add(String.format("§aRAM: §f%s/%s", com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()),
+            parts.add(String.format("§a💾 RAM: §f%s/%s", com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()),
                     com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getMaxRamBytes())));
         }
         if (cfg.showServerNetwork) {
-            parts.add(String.format("§d↓ §f%s §d↑ §f%s",
+            parts.add(String.format("§d🌐 Net: §f↓ %s ↑ %s",
                     com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getDownloadBytesPerSec()),
                     com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getUploadBytesPerSec())));
         }
@@ -269,7 +276,7 @@ public class RpgTabRenderer {
             boolean c2me = stats.isC2meOpenclLoaded();
             if (!gpuName.isEmpty() || c2me) {
                 StringBuilder gpuSb = new StringBuilder();
-                if (!gpuName.isEmpty()) {
+                if (!gpuName.isEmpty() && !gpuName.equalsIgnoreCase("unknown")) {
                     gpuSb.append("§3⚡ GPU: §f").append(gpuName);
                 }
                 if (c2me) {
@@ -279,8 +286,10 @@ public class RpgTabRenderer {
                     gpuSb.append("§2✔ C2ME OpenCL: §aActif");
                 }
                 String line2 = gpuSb.toString();
-                int line2W = font.width(line2);
-                graphics.drawString(font, line2, startX + (totalWidth - line2W) / 2, footerY + 16, 0xFFE0E0E0, false);
+                if (!line2.isEmpty()) {
+                    int line2W = font.width(line2);
+                    graphics.drawString(font, line2, startX + (totalWidth - line2W) / 2, footerY + 16, 0xFFE0E0E0, false);
+                }
             }
         }
     }

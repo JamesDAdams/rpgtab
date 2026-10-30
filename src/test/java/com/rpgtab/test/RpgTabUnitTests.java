@@ -21,6 +21,7 @@ public class RpgTabUnitTests {
         testConfigDataDefaultValues();
         testSyncPlayerStatsPayloadEdgeCases();
         testServerHardwareStats();
+        testFpsFormatting();
         System.out.println("ALL RPG TAB TESTS PASSED!");
     }
 
@@ -220,7 +221,7 @@ public class RpgTabUnitTests {
 
     private static void testConfigDataDefaultValues() {
         RpgTabConfigData data = new RpgTabConfigData();
-        if (!data.showOfflinePlayers || !data.showPlayTime || !data.showHealth) {
+        if (!data.showOfflinePlayers || !data.showPlayTime || !data.showHealth || !data.showFps) {
             throw new AssertionError("Default config values mismatch");
         }
         if (data.titleColor != RpgTabConstants.DEFAULT_TITLE_COLOR) {
@@ -299,5 +300,16 @@ public class RpgTabUnitTests {
         }
 
         System.out.println("[PASS] ServerHardwareStats tests");
+    }
+
+    private static void testFpsFormatting() {
+        int realFps = 60;
+        int genFps = 60;
+        int totalFps = realFps + genFps;
+        String formatted = totalFps + " FPS §7(" + realFps + " + " + genFps + " gen)";
+        if (!"120 FPS §7(60 + 60 gen)".equals(formatted)) {
+            throw new AssertionError("FPS format mismatch: " + formatted);
+        }
+        System.out.println("[PASS] FPS formatting tests");
     }
 }

@@ -30,13 +30,15 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
   - Toggle any column on or off (avatar, health, food, xp, deaths, ftb, advancements, playtime, ping).
   - Customizable title text and colors (HEX format `0xRRGGBB` or `#RRGGBB`).
   - Toggle offline player visibility (enabled by default).
+- **Client & Performance**:
+  - **Client FPS**: Real-time FPS counter in the top-right corner of the TAB menu, fully compatible with **NeoForge GGTU (Resolution Scaler)** frame generation (displays total FPS, real frames, and generated frames).
 - **Server Hardware & Network Metrics (Footer)**:
   - Real-time **TPS & MSPT** display with color indicators.
-  - Server **CPU usage** percentage.
-  - Allocated & max **RAM** usage (e.g. `4.2 / 16.0 Go`).
-  - Real-time **Network transfer rates** (Download and Upload in Ko/s or Mo/s).
-  - Server **Uptime** since last reboot.
-  - **GPU & C2ME OpenCL detection**: Displays the connected GPU name and C2ME OpenCL Acceleration Module status.
+  - Server **CPU usage** percentage with 🖥 icon.
+  - Allocated & max **RAM** usage with 💾 icon.
+  - Real-time **Network transfer rates** with 🌐 Net: ↓ DL ↑ UL.
+  - Server **Uptime** since last reboot (⏱ Up:).
+  - **GPU & C2ME OpenCL detection**: Displays the connected GPU name via multi-level OpenCL/procfs/OSHI fallback and C2ME OpenCL Acceleration Module status.
   - Configurable server toggles in `config/rpgtab-server.toml` (`[server_metrics]`).
 
 ### 📂 Project Structure
@@ -63,4 +65,4 @@ Requires Java 21 LTS (OpenJDK or Zulu):
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-The compiled JAR will be output to `build/` as `rpgtab-1.9.0-neoforge-1.21.1.jar`.
+The compiled JAR will be output to `build/` as `rpgtab-1.10.0-neoforge-1.21.1.jar`.

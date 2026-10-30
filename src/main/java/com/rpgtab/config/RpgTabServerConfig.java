@@ -29,6 +29,7 @@ public class RpgTabServerConfig {
     public final ModConfigSpec.BooleanValue showAdvancements;
     public final ModConfigSpec.BooleanValue showPlayTime;
     public final ModConfigSpec.BooleanValue showPing;
+    public final ModConfigSpec.BooleanValue showFps;
 
     // Métriques serveur (Footer)
     public final ModConfigSpec.BooleanValue showServerFooter;
@@ -68,6 +69,7 @@ public class RpgTabServerConfig {
         showAdvancements = builder.comment("Afficher les progres/advancements termines").define("showAdvancements", true);
         showPlayTime = builder.comment("Afficher le temps de jeu sur le serveur").define("showPlayTime", true);
         showPing = builder.comment("Afficher le ping / latence").define("showPing", true);
+        showFps = builder.comment("Afficher les FPS du client en haut a droite du menu TAB (compatible GGTU)").define("showFps", true);
         builder.pop();
 
         builder.push("server_metrics");
