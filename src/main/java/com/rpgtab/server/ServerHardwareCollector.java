@@ -447,8 +447,11 @@ public class ServerHardwareCollector {
                 if (pStats.memoryLimitBytes() > 0) {
                     maxRam = pStats.memoryLimitBytes();
                 }
-                dlSpeed = pStats.networkRxSpeed();
-                ulSpeed = pStats.networkTxSpeed();
+                // Use Pelican network speed if positive, otherwise keep container probe
+                if (pStats.networkRxSpeed() > 0 || pStats.networkTxSpeed() > 0 || (dlSpeed == 0 && ulSpeed == 0)) {
+                    dlSpeed = pStats.networkRxSpeed();
+                    ulSpeed = pStats.networkTxSpeed();
+                }
             }
         } catch (Throwable ignored) {}
 

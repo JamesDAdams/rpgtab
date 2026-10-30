@@ -11,11 +11,16 @@ import java.time.Duration;
 public class PelicanApiHelper {
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofMillis(1200))
+            .connectTimeout(Duration.ofMillis(1500))
             .build();
 
     private static volatile PelicanStats cachedStats = null;
-    private static volatile long lastFetchTime = 0;
+    private static volatile long lastPollTime = 0;
+    private static volatile long prevApiRxBytes = -1;
+    private static volatile long prevApiTxBytes = -1;
+    private static volatile long prevApiSampleTime = 0;
+    private static volatile long computedRxSpeed = 0;
+    private static volatile long computedTxSpeed = 0;
     private static volatile boolean fetching = false;
 
     public record PelicanStats(double cpuAbsolute, long memoryBytes, long memoryLimitBytes,
@@ -28,8 +33,7 @@ public class PelicanApiHelper {
         }
 
         long now = System.currentTimeMillis();
-        // Rafraîchir toutes les 1000 ms (1 seconde) en arrière-plan sans bloquer
-        if (now - lastFetchTime > 1000 && !fetching) {
+        if (now - lastPollTime > 800 && !fetching) {
             fetching = true;
             Thread.ofVirtual().start(() -> {
                 try {
@@ -44,7 +48,7 @@ public class PelicanApiHelper {
                             .header("Authorization", "Bearer " + apiKey.trim())
                             .header("Accept", "application/json")
                             .header("Content-Type", "application/json")
-                            .timeout(Duration.ofMillis(1200))
+                            .timeout(Duration.ofMillis(1500))
                             .GET()
                             .build();
 
@@ -59,13 +63,18 @@ public class PelicanApiHelper {
                         long rx = resources.get("network_rx_bytes").getAsLong();
                         long tx = resources.get("network_tx_bytes").getAsLong();
 
-                        long rxSpeed = 0;
-                        long txSpeed = 0;
-                        if (cachedStats != null && lastFetchTime > 0) {
-                            long dur = Math.max(1, now - lastFetchTime);
-                            rxSpeed = Math.max(0, (rx - cachedStats.networkRxBytes()) * 1000L / dur);
-                            txSpeed = Math.max(0, (tx - cachedStats.networkTxBytes()) * 1000L / dur);
+                        long sampleTime = System.currentTimeMillis();
+                        if (prevApiSampleTime > 0 && sampleTime > prevApiSampleTime && prevApiRxBytes >= 0 && prevApiTxBytes >= 0) {
+                            long durMs = sampleTime - prevApiSampleTime;
+                            long rxDelta = Math.max(0L, rx - prevApiRxBytes);
+                            long txDelta = Math.max(0L, tx - prevApiTxBytes);
+                            computedRxSpeed = (rxDelta * 1000L) / durMs;
+                            computedTxSpeed = (txDelta * 1000L) / durMs;
                         }
+
+                        prevApiSampleTime = sampleTime;
+                        prevApiRxBytes = rx;
+                        prevApiTxBytes = tx;
 
                         long memLimit = 0;
                         if (attrs.has("limits") && attrs.get("limits").isJsonObject()) {
@@ -75,11 +84,11 @@ public class PelicanApiHelper {
                             }
                         }
 
-                        cachedStats = new PelicanStats(cpu, mem, memLimit, rx, tx, rxSpeed, txSpeed, true);
+                        cachedStats = new PelicanStats(cpu, mem, memLimit, rx, tx, computedRxSpeed, computedTxSpeed, true);
                     }
                 } catch (Throwable ignored) {
                 } finally {
-                    lastFetchTime = System.currentTimeMillis();
+                    lastPollTime = System.currentTimeMillis();
                     fetching = false;
                 }
             });
