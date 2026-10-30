@@ -256,10 +256,17 @@ public class RpgTabRenderer {
 
         String team = entry.getTeamName();
         if (team != null && !team.trim().isEmpty()) {
-            // Afficher le nom et la team en dessous
-            graphics.drawString(font, trimmedName, currX + 2, y + 3, nameColor, false);
-            String trimmedTeam = font.plainSubstrByWidth("[" + team.trim() + "]", COL_NAME - 10);
-            graphics.drawString(font, trimmedTeam, currX + 2, y + 13, 0xFF9E9E9E, false);
+            String rawTeam = team.trim();
+            if (rawTeam.startsWith("[") && rawTeam.endsWith("]") && rawTeam.length() > 2) {
+                rawTeam = rawTeam.substring(1, rawTeam.length() - 1).trim();
+            }
+            if (!rawTeam.isEmpty()) {
+                graphics.drawString(font, trimmedName, currX + 2, y + 3, nameColor, false);
+                String trimmedTeam = font.plainSubstrByWidth(rawTeam, COL_NAME - 10);
+                graphics.drawString(font, "§o" + trimmedTeam, currX + 2, y + 13, 0xFF9E9E9E, false);
+            } else {
+                graphics.drawString(font, trimmedName, currX + 2, textY, nameColor, false);
+            }
         } else {
             graphics.drawString(font, trimmedName, currX + 2, textY, nameColor, false);
         }

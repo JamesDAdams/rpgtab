@@ -56,6 +56,9 @@ public class ServerStatsCollector {
 
         int ftbQuests = FTBQuestsHelper.getCompletedQuestsCount(player);
         String teamName = FTBQuestsHelper.getTeamName(player.getUUID());
+        if (teamName.isEmpty() && player.getTeam() != null) {
+            teamName = player.getTeam().getDisplayName().getString();
+        }
 
         return new PlayerStatsEntry(
                 player.getUUID(),

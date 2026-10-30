@@ -13,7 +13,7 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
 - **Top Priority Display**: Automatically clears conflicting UI layers (such as RPG-HUD or PartyHUD) while holding the TAB key, guaranteeing full visibility.
 - **Comprehensive Player Stats**:
   - **Player Avatar**: Dynamic player skin head rendering.
-  - **FTB Team Name**: Displays the player's FTB Team name directly below their username (e.g., `[MyTeam]`).
+  - **FTB Team Name**: Displays the player's FTB Team name in italics directly below their username (e.g., *MyTeam*) only when the player belongs to a team.
   - **Dynamic Health Bar**: Visual fill bar with exact numerical HP centered inside (e.g., `24/24`) and smooth color adaptation (green > orange > red).
   - **Food Level**: Hunger points displayed as `20/20`.
   - **XP Level**: Experience level formatted as `Lvl X`.

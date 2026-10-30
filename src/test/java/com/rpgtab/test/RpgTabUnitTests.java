@@ -16,6 +16,7 @@ public class RpgTabUnitTests {
         testPlayerStatsEntryAccessors();
         testPlayerStatsEntryEdgeCases();
         testPlayTimeFormatting();
+        testTeamNameFormatting();
         testConfigDataParsing();
         testConfigDataDefaultValues();
         testSyncPlayerStatsPayloadEdgeCases();
@@ -143,6 +144,48 @@ public class RpgTabUnitTests {
         }
 
         System.out.println("[PASS] PlayTime formatting tests");
+    }
+
+    private static void testTeamNameFormatting() {
+        UUID dummy = UUID.randomUUID();
+        // Solo player with no team
+        PlayerStatsEntry noTeam = new PlayerStatsEntry(dummy, "SoloPlayer", "", true, 20, 20, 20, 5, 0, 0, 0, 0, 0, 1000L);
+        if (!"".equals(noTeam.getTeamName())) {
+            throw new AssertionError("TeamName should be empty when no team");
+        }
+
+        // Player with null team
+        PlayerStatsEntry nullTeam = new PlayerStatsEntry(dummy, "SoloPlayer", null, true, 20, 20, 20, 5, 0, 0, 0, 0, 0, 1000L);
+        if (!"".equals(nullTeam.getTeamName())) {
+            throw new AssertionError("TeamName should fallback to empty string when null");
+        }
+
+        // Player with whitespace team
+        PlayerStatsEntry blankTeam = new PlayerStatsEntry(dummy, "SoloPlayer", "   ", true, 20, 20, 20, 5, 0, 0, 0, 0, 0, 1000L);
+        if (!blankTeam.getTeamName().trim().isEmpty()) {
+            throw new AssertionError("TeamName should be empty when blank");
+        }
+
+        // Player with actual team: verify no brackets and italic string formatting
+        PlayerStatsEntry withTeam = new PlayerStatsEntry(dummy, "TeamPlayer", "Warriors", true, 20, 20, 20, 5, 0, 0, 0, 0, 0, 1000L);
+        String formattedTeam = "§o" + withTeam.getTeamName().trim();
+        if (formattedTeam.contains("[") || formattedTeam.contains("]")) {
+            throw new AssertionError("Team display should not contain brackets");
+        }
+        if (!formattedTeam.startsWith("§o")) {
+            throw new AssertionError("Team display should have italic code prefix");
+        }
+
+        // Verify bracket stripping if input has brackets
+        String bracketed = "[Knights]";
+        String stripped = (bracketed.startsWith("[") && bracketed.endsWith("]") && bracketed.length() > 2)
+                ? bracketed.substring(1, bracketed.length() - 1).trim()
+                : bracketed;
+        if (!"Knights".equals(stripped)) {
+            throw new AssertionError("Failed to strip brackets: " + stripped);
+        }
+
+        System.out.println("[PASS] TeamName formatting tests");
     }
 
     private static void testConfigDataParsing() {

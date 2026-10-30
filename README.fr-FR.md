@@ -13,7 +13,7 @@ Un remplacement soigné et hautement personnalisable de la liste des joueurs (me
 - **Affichage au Premier Plan Absolu** : Annule automatiquement les éléments d'interface conflictuels (comme RPG-HUD ou PartyHUD) lors de l'appui sur TAB pour une lisibilité optimale.
 - **Statistiques Complètes par Joueur** :
   - **Tête du Joueur** : Avatar dynamique du skin.
-  - **Nom de la Team FTB** : Affiche le nom de l'équipe FTB Teams sous le pseudo du joueur (ex: `[MaTeam]`).
+  - **Nom de la Team FTB** : Affiche le nom de l'équipe FTB Teams en italique sous le pseudo du joueur (ex: *MaTeam*) uniquement lorsque le joueur appartient à une équipe.
   - **Barre de Vie Intégrée** : Remplissage dynamique avec affichage direct des PV au centre (ex: `24/24`) et couleur adaptative (vert > orange > rouge).
   - **Nourriture** : Niveau de faim sous forme `20/20`.
   - **Niveau d'XP** : Affiché sous forme `Lvl X`.

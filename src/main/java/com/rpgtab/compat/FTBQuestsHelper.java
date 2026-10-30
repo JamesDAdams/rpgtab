@@ -44,11 +44,20 @@ public class FTBQuestsHelper {
             if (dev.ftb.mods.ftbteams.api.FTBTeamsAPI.api().isManagerLoaded()) {
                 java.util.Optional<dev.ftb.mods.ftbteams.api.Team> teamOpt = dev.ftb.mods.ftbteams.api.FTBTeamsAPI.api().getManager().getTeamForPlayerID(uuid);
                 if (teamOpt.isPresent()) {
-                    net.minecraft.network.chat.Component nameComp = teamOpt.get().getName();
-                    if (nameComp != null) {
-                        return nameComp.getString();
+                    dev.ftb.mods.ftbteams.api.Team team = teamOpt.get();
+                    if (team.isPartyTeam()) {
+                        net.minecraft.network.chat.Component nameComp = team.getName();
+                        if (nameComp != null) {
+                            String name = nameComp.getString();
+                            if (name != null && !name.trim().isEmpty()) {
+                                return name.trim();
+                            }
+                        }
+                        String shortName = team.getShortName();
+                        if (shortName != null && !shortName.trim().isEmpty()) {
+                            return shortName.trim();
+                        }
                     }
-                    return teamOpt.get().getShortName();
                 }
             }
         } catch (Throwable ignored) {}
