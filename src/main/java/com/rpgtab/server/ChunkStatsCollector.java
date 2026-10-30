@@ -35,6 +35,25 @@ public class ChunkStatsCollector {
 
     public static int getDhGeneratingChunksCount() {
         int total = 0;
+        // 1. Check Distant Horizons ThreadPoolUtil world gen / builder executor
+        try {
+            Class<?> threadPoolClass = Class.forName("com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil");
+            Object genExec = threadPoolClass.getMethod("getWorldGenExecutor").invoke(null);
+            if (genExec != null) {
+                int running = (int) genExec.getClass().getMethod("getRunningTaskCount").invoke(genExec);
+                int queue = (int) genExec.getClass().getMethod("getQueueSize").invoke(genExec);
+                total += (running + queue);
+            }
+            Object lodExec = threadPoolClass.getMethod("getChunkToLodBuilderExecutor").invoke(null);
+            if (lodExec != null) {
+                int running = (int) lodExec.getClass().getMethod("getRunningTaskCount").invoke(lodExec);
+                int queue = (int) lodExec.getClass().getMethod("getQueueSize").invoke(lodExec);
+                total += (running + queue);
+            }
+            if (total > 0) return total;
+        } catch (Throwable ignored) {}
+
+        // 2. Check QueueDepthProbe LIVE_QUEUES
         try {
             Class<?> probeClass = Class.forName("mobius.seedrenderer.dh.QueueDepthProbe");
             java.lang.reflect.Field queuesField = probeClass.getDeclaredField("LIVE_QUEUES");
@@ -50,23 +69,6 @@ public class ChunkStatsCollector {
             }
         } catch (Throwable ignored) {}
 
-        try {
-            Class<?> dhQueueClass = Class.forName("com.seibel.distanthorizons.core.generation.queues.WorldGenerationQueue");
-            for (java.lang.reflect.Field f : dhQueueClass.getDeclaredFields()) {
-                if (Collection.class.isAssignableFrom(f.getType())) {
-                    f.setAccessible(true);
-                    Object val = f.get(null);
-                    if (val instanceof Collection<?> col) {
-                        for (Object q : col) {
-                            int inProg = (int) q.getClass().getMethod("getInProgressTaskCount").invoke(q);
-                            int waiting = (int) q.getClass().getMethod("getWaitingTaskCount").invoke(q);
-                            total += (inProg + waiting);
-                        }
-                        if (total > 0) return total;
-                    }
-                }
-            }
-        } catch (Throwable ignored) {}
         return total;
     }
 
