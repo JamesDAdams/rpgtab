@@ -282,18 +282,18 @@ public class RpgTabRenderer {
             graphics.drawString(font, line1, startX + (totalWidth - line1W) / 2, footerY + 4, 0xFFE0E0E0, false);
         }
 
-        // Ligne 2 : Chunks serveur, C2ME OpenCL & Distant Horizons
+        // Ligne 2 : Chunks serveur, Distant Horizons & C2ME OpenCL
         StringBuilder line2Sb = new StringBuilder();
         if (cfg.showServerChunks) {
             line2Sb.append("§2☵ ").append(stats.getFormattedChunks());
         }
-        if (cfg.showServerGpu && stats.isC2meOpenclLoaded()) {
-            if (line2Sb.length() > 0) line2Sb.append(" §8| ");
-            line2Sb.append("§2✔ C2ME OpenCL: §aActif");
-        }
         if (cfg.showServerDh && stats.isDhLoaded()) {
             if (line2Sb.length() > 0) line2Sb.append(" §8| ");
             line2Sb.append("§b🌌 DH: §a").append(stats.getDhGeneratingChunks()).append(" gen");
+        }
+        if (cfg.showServerGpu && stats.isC2meOpenclLoaded()) {
+            if (line2Sb.length() > 0) line2Sb.append(" §8| ");
+            line2Sb.append("§2✔ C2ME OpenCL: §aActif");
         }
 
         String line2 = line2Sb.toString();
