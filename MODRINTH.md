@@ -23,6 +23,8 @@ Use this information when creating your mod page on [Modrinth](https://modrinth.
 
 A clean, highly customizable medieval/fantasy RPG player list (**TAB menu**) replacement for **Minecraft NeoForge 1.21.1**.
 
+![RPG Tab Overlay Preview](https://raw.githubusercontent.com/JamesDAdams/rpgtab/main/preview.png)
+
 Transform your standard multiplayer player list into an immersive adventurer roster with live player stats, dynamic health gauges, client FPS (with frame generation support), and real-time server hardware performance monitoring.
 
 ---
