@@ -44,6 +44,11 @@ public class RpgTabServerConfig {
     public final ModConfigSpec.BooleanValue showServerDh;
     public final ModConfigSpec.BooleanValue showServerSeedGen;
 
+    // Pelican Panel API Integration
+    public final ModConfigSpec.ConfigValue<String> pelicanUrl;
+    public final ModConfigSpec.ConfigValue<String> pelicanApiKey;
+    public final ModConfigSpec.ConfigValue<String> pelicanServerId;
+
     // Couleurs configurables (Format hex ARGB ou RGB, ex: "#FFE5A93C" ou "0xFFE5A93C")
     public final ModConfigSpec.ConfigValue<String> healthColor;
     public final ModConfigSpec.ConfigValue<String> foodColor;
@@ -88,6 +93,12 @@ public class RpgTabServerConfig {
         showServerGpu = builder.comment("Afficher le GPU du serveur et l'etat d'acceleration C2ME OpenCL").define("showServerGpu", true);
         showServerDh = builder.comment("Afficher le statut Distant Horizons cote serveur").define("showServerDh", true);
         showServerSeedGen = builder.comment("Afficher le statut SeedGen cote serveur").define("showServerSeedGen", true);
+        builder.pop();
+
+        builder.push("pelican_api");
+        pelicanUrl = builder.comment("URL du panel Pelican (ex: https://panel.example.com)").define("pelicanUrl", "");
+        pelicanApiKey = builder.comment("Cle API Client Pelican (ex: ptlc_... ou pelican_...)").define("pelicanApiKey", "");
+        pelicanServerId = builder.comment("Identifiant court du serveur Pelican (ex: 39de0ded)").define("pelicanServerId", "");
         builder.pop();
 
         builder.push("colors");

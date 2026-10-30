@@ -28,9 +28,10 @@ Un remplacement soigné et hautement personnalisable de la liste des joueurs (me
 - **Support des Joueurs Hors-Ligne** :
   - Affiche les statistiques des joueurs ayant déjà joué sur le serveur même lorsqu'ils sont déconnectés (temps de jeu, morts, quêtes FTB, avancements JSON).
 - **Configuration Serveur Complète** (`config/rpgtab-server.toml`) :
-  - Activation ou désactivation de chaque colonne au choix.
+  - Activation ou désactivation de chaque colonne au choix (avatar, health, food, xp, deaths, ftb, adv, time, ping, fps, dimension).
   - Personnalisation du titre et des couleurs en hexadécimal (`0xRRGGBB` ou `#RRGGBB`).
   - Option d'affichage des joueurs hors ligne (activée par défaut).
+  - **Intégration API Pelican Panel** : Configuration sous `[pelican_api]` (`pelicanUrl`, `pelicanApiKey`, `pelicanServerId`) pour remonter directement les valeurs réelles du dashboard Pelican (CPU, RAM, débit réseau).
 - **Performances & Client** :
   - **FPS Client** : Compteur de FPS en temps réel en haut à droite du menu TAB, compatible avec **NeoForge GGTU (Resolution Scaler)** pour afficher les FPS réels et les frames générées.
 - **Métriques Matérielles & Réseau du Serveur (Footer)** :
@@ -67,4 +68,4 @@ Nécessite Java 21 LTS (OpenJDK ou Zulu) :
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.18.0-neoforge-1.21.1.jar`.
+Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.19.0-neoforge-1.21.1.jar`.

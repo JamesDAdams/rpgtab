@@ -28,9 +28,10 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
 - **Offline Players Support**:
   - Displays data for previously connected players who are currently offline (play time, deaths, FTB quests, and JSON advancements).
 - **Server Configuration** (`config/rpgtab-server.toml`):
-  - Toggle any column on or off (avatar, health, food, xp, deaths, ftb, advancements, playtime, ping).
+  - Toggle any column on or off (avatar, health, food, xp, deaths, ftb, advancements, playtime, ping, fps, dimension).
   - Customizable title text and colors (HEX format `0xRRGGBB` or `#RRGGBB`).
   - Toggle offline player visibility (enabled by default).
+  - **Pelican Panel API Integration**: Configure `[pelican_api]` (`pelicanUrl`, `pelicanApiKey`, `pelicanServerId`) to fetch actual real-time container metrics directly from the Pelican panel.
 - **Client & Performance**:
   - **Client FPS**: Real-time FPS counter in the top-right corner of the TAB menu, fully compatible with **NeoForge GGTU (Resolution Scaler)** frame generation (displays total FPS, real frames, and generated frames).
 - **Server Hardware & Network Metrics (Footer)**:
@@ -67,4 +68,4 @@ Requires Java 21 LTS (OpenJDK or Zulu):
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-The compiled JAR will be output to `build/` as `rpgtab-1.18.0-neoforge-1.21.1.jar`.
+The compiled JAR will be output to `build/` as `rpgtab-1.19.0-neoforge-1.21.1.jar`.

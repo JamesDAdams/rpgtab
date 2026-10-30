@@ -431,6 +431,26 @@ public class ServerHardwareCollector {
         } catch (Throwable ignored) {}
 
         updateNetworkSpeeds();
+        long dlSpeed = curDlSpeed;
+        long ulSpeed = curUlSpeed;
+
+        // Pelican API override if configured
+        try {
+            String pelicanUrl = com.rpgtab.config.RpgTabServerConfig.CONFIG.pelicanUrl.get();
+            String pelicanApiKey = com.rpgtab.config.RpgTabServerConfig.CONFIG.pelicanApiKey.get();
+            String pelicanServerId = com.rpgtab.config.RpgTabServerConfig.CONFIG.pelicanServerId.get();
+
+            PelicanApiHelper.PelicanStats pStats = PelicanApiHelper.getStats(pelicanUrl, pelicanApiKey, pelicanServerId);
+            if (pStats != null) {
+                cpu = pStats.cpuAbsolute();
+                usedRam = pStats.memoryBytes();
+                if (pStats.memoryLimitBytes() > 0) {
+                    maxRam = pStats.memoryLimitBytes();
+                }
+                dlSpeed = pStats.networkRxSpeed();
+                ulSpeed = pStats.networkTxSpeed();
+            }
+        } catch (Throwable ignored) {}
 
         int totalLoadedChunks = ChunkStatsCollector.getTotalLoadedChunks(server);
         int totalGeneratingChunks = ChunkStatsCollector.getTotalGeneratingChunks(server);
@@ -443,7 +463,7 @@ public class ServerHardwareCollector {
         String gpuStats = getGpuStats(server);
 
         return new ServerHardwareStats(tps, mspt, cpu, maxCpuPercent, usedRam, maxRam, uptimeSec,
-                curDlSpeed, curUlSpeed, totalLoadedChunks, totalGeneratingChunks, dhGeneratingChunks,
+                dlSpeed, ulSpeed, totalLoadedChunks, totalGeneratingChunks, dhGeneratingChunks,
                 c2me, dh, seedGen, gpu, gpuStats);
     }
 }
