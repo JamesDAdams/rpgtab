@@ -30,6 +30,8 @@ public class RpgTabServerConfig {
     public final ModConfigSpec.BooleanValue showPlayTime;
     public final ModConfigSpec.BooleanValue showPing;
     public final ModConfigSpec.BooleanValue showFps;
+    public final ModConfigSpec.BooleanValue showLoadedChunks;
+    public final ModConfigSpec.BooleanValue showGeneratingChunks;
 
     // Métriques serveur (Footer)
     public final ModConfigSpec.BooleanValue showServerFooter;
@@ -72,6 +74,8 @@ public class RpgTabServerConfig {
         showPlayTime = builder.comment("Afficher le temps de jeu sur le serveur").define("showPlayTime", true);
         showPing = builder.comment("Afficher le ping / latence").define("showPing", true);
         showFps = builder.comment("Afficher les FPS du client en haut a droite du menu TAB (compatible GGTU)").define("showFps", true);
+        showLoadedChunks = builder.comment("Afficher le nombre de chunks charges par le joueur").define("showLoadedChunks", true);
+        showGeneratingChunks = builder.comment("Afficher le nombre de chunks generes / en attente (vanilla + DH)").define("showGeneratingChunks", true);
         builder.pop();
 
         builder.push("server_metrics");

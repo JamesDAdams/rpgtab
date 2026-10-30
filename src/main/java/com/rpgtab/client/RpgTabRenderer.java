@@ -36,6 +36,8 @@ public class RpgTabRenderer {
     private static final int COL_QUESTS = 65;
     private static final int COL_ADV = 60;
     private static final int COL_PLAYTIME = 65;
+    private static final int COL_CHUNKS = 50;
+    private static final int COL_GEN = 65;
     private static final int COL_PING = 50;
 
     public static void render(GuiGraphics graphics) {
@@ -113,6 +115,8 @@ public class RpgTabRenderer {
         if (cfg.showFtbQuests) computedWidth += COL_QUESTS;
         if (cfg.showAdvancements) computedWidth += COL_ADV;
         if (cfg.showPlayTime) computedWidth += COL_PLAYTIME;
+        if (cfg.showLoadedChunks) computedWidth += COL_CHUNKS;
+        if (cfg.showGeneratingChunks) computedWidth += COL_GEN;
         if (cfg.showPing) computedWidth += COL_PING;
         computedWidth += (PADDING_X * 2);
 
@@ -205,6 +209,14 @@ public class RpgTabRenderer {
         if (cfg.showPlayTime) {
             graphics.drawString(font, "\u23F1 Time", currentX + 2, colY, cfg.playTimeColor, false);
             currentX += COL_PLAYTIME;
+        }
+        if (cfg.showLoadedChunks) {
+            graphics.drawString(font, "☵ Chunks", currentX + 2, colY, 0xFF6EE7B7, false);
+            currentX += COL_CHUNKS;
+        }
+        if (cfg.showGeneratingChunks) {
+            graphics.drawString(font, "⚙ Gen", currentX + 2, colY, 0xFFFBBF24, false);
+            currentX += COL_GEN;
         }
         if (cfg.showPing) {
             graphics.drawString(font, "\u25CE Ping", currentX + 2, colY, 0xFF88AAFF, false);
@@ -419,7 +431,19 @@ public class RpgTabRenderer {
             currX += COL_PLAYTIME;
         }
 
-        // 10. Ping
+        // 10. Chunks chargés
+        if (cfg.showLoadedChunks) {
+            graphics.drawString(font, entry.getFormattedLoadedChunks(), currX + 4, textY, isOnline ? 0xFF6EE7B7 : 0xFF777777, false);
+            currX += COL_CHUNKS;
+        }
+
+        // 11. Chunks en génération
+        if (cfg.showGeneratingChunks) {
+            graphics.drawString(font, entry.getFormattedGeneratingChunks(), currX + 4, textY, isOnline ? 0xFFFBBF24 : 0xFF777777, false);
+            currX += COL_GEN;
+        }
+
+        // 12. Ping
         if (cfg.showPing) {
             if (info != null) {
                 int ping = info.getLatency();

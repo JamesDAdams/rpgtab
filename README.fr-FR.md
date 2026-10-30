@@ -23,6 +23,8 @@ Un remplacement soigné et hautement personnalisable de la liste des joueurs (me
   - **Quêtes FTB Quests** : Nombre de quêtes terminées par joueur/équipe (support souple sans crash si le mod est absent).
   - **Progrès / Advancements** : Nombre d'avancements débloqués (les recettes de craft sont exclues).
   - **Temps de Jeu** : Temps passé sur le serveur formaté (ex: `2h 15m`).
+  - **Chunks Chargés** : Nombre de chunks du monde activement suivis et chargés pour chaque joueur.
+  - **Chunks en Génération** : Nombre de chunks actuellement en cours de génération ou en attente pour chaque joueur (vanilla + Distant Horizons).
   - **Latence / Ping** : Ping en millisecondes avec code couleur.
 - **Support des Joueurs Hors-Ligne** :
   - Affiche les statistiques des joueurs ayant déjà joué sur le serveur même lorsqu'ils sont déconnectés (temps de jeu, morts, quêtes FTB, avancements JSON).
@@ -65,4 +67,4 @@ Nécessite Java 21 LTS (OpenJDK ou Zulu) :
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.11.0-neoforge-1.21.1.jar`.
+Le fichier JAR sera généré dans `build/` sous le nom `rpgtab-1.12.0-neoforge-1.21.1.jar`.

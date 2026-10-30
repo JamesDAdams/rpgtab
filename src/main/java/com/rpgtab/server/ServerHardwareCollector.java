@@ -69,8 +69,18 @@ public class ServerHardwareCollector {
     public static boolean isSeedGenLoaded() {
         if (cachedSeedGenLoaded == null) {
             try {
-                cachedSeedGenLoaded = ModList.get().isLoaded("seedrenderer")
-                        || ModList.get().isLoaded("seedgen");
+                boolean loaded = ModList.get().isLoaded("seedrenderer") || ModList.get().isLoaded("seedgen");
+                if (loaded) {
+                    try {
+                        Class<?> clientWg = Class.forName("mobius.seedrenderer.dh.ClientWorldgen");
+                        boolean fellBack = (boolean) clientWg.getMethod("fellBack").invoke(null);
+                        if (fellBack) {
+                            cachedSeedGenLoaded = false;
+                            return false;
+                        }
+                    } catch (Throwable ignored) {}
+                }
+                cachedSeedGenLoaded = loaded;
             } catch (Throwable t) {
                 cachedSeedGenLoaded = false;
             }
@@ -159,11 +169,7 @@ public class ServerHardwareCollector {
             } catch (Throwable ignored) {}
         }
 
-        if (isC2meOpenclLoaded()) {
-            cachedGpuName = "OpenCL Acceleration GPU";
-        } else {
-            cachedGpuName = "";
-        }
+        cachedGpuName = "";
         return cachedGpuName;
     }
 

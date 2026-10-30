@@ -60,6 +60,10 @@ public class ServerStatsCollector {
             teamName = player.getTeam().getDisplayName().getString();
         }
 
+        int loadedChunks = ChunkStatsCollector.getLoadedChunksCount(player);
+        int generatingChunks = ChunkStatsCollector.getGeneratingChunksCount(player);
+        int dhGeneratingChunks = ChunkStatsCollector.getDhGeneratingChunksCount(player);
+
         return new PlayerStatsEntry(
                 player.getUUID(),
                 player.getGameProfile().getName(),
@@ -74,7 +78,10 @@ public class ServerStatsCollector {
                 deaths,
                 advancementsCount,
                 ftbQuests,
-                playTime
+                playTime,
+                loadedChunks,
+                generatingChunks,
+                dhGeneratingChunks
         );
     }
 
@@ -127,7 +134,10 @@ public class ServerStatsCollector {
                 deaths,
                 advancementsCount,
                 ftbQuests,
-                playTime
+                playTime,
+                0,
+                0,
+                0
         );
     }
 

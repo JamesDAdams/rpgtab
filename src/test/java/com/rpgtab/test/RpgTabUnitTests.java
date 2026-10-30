@@ -73,7 +73,7 @@ public class RpgTabUnitTests {
 
     private static void testPlayerStatsEntryAccessors() {
         UUID id = UUID.nameUUIDFromBytes("Player1".getBytes());
-        PlayerStatsEntry entry = new PlayerStatsEntry(id, "Player1", "", false, 20.0f, 20.0f, 20, 5.0f, 100, 0.0f, 0, 50, 100, 150000L);
+        PlayerStatsEntry entry = new PlayerStatsEntry(id, "Player1", "", false, 20.0f, 20.0f, 20, 5.0f, 100, 0.0f, 0, 50, 100, 150000L, 441, 12, 4);
         if (!entry.getUuid().equals(id)) {
             throw new AssertionError("UUID mismatch");
         }
@@ -85,6 +85,9 @@ public class RpgTabUnitTests {
         }
         if (!"2h 5m".equals(entry.getFormattedPlayTime())) {
             throw new AssertionError("Playtime formatting mismatch: " + entry.getFormattedPlayTime());
+        }
+        if (entry.getLoadedChunks() != 441 || entry.getGeneratingChunks() != 12 || entry.getDhGeneratingChunks() != 4) {
+            throw new AssertionError("Chunk stats mismatch");
         }
         System.out.println("[PASS] PlayerStatsEntry accessor tests");
     }
@@ -221,7 +224,8 @@ public class RpgTabUnitTests {
 
     private static void testConfigDataDefaultValues() {
         RpgTabConfigData data = new RpgTabConfigData();
-        if (!data.showOfflinePlayers || !data.showPlayTime || !data.showHealth || !data.showFps) {
+        if (!data.showOfflinePlayers || !data.showPlayTime || !data.showHealth || !data.showFps
+                || !data.showLoadedChunks || !data.showGeneratingChunks) {
             throw new AssertionError("Default config values mismatch");
         }
         if (data.titleColor != RpgTabConstants.DEFAULT_TITLE_COLOR) {

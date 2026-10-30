@@ -23,6 +23,8 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
   - **FTB Quests**: Total completed quests per team/player (safe reflection fallback if FTB Quests is not installed).
   - **Advancements**: Unlocked achievements count (crafting recipes are filtered out).
   - **Server Play Time**: Formatted total playtime (e.g., `2h 15m`).
+  - **Loaded Chunks**: Number of world chunks actively tracked and loaded by each player.
+  - **Generating Chunks**: Number of world chunks currently generating or pending generation in real-time (including vanilla and Distant Horizons tasks).
   - **Latency / Ping**: Color-coded ping in milliseconds.
 - **Offline Players Support**:
   - Displays data for previously connected players who are currently offline (play time, deaths, FTB quests, and JSON advancements).
@@ -65,4 +67,4 @@ Requires Java 21 LTS (OpenJDK or Zulu):
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-The compiled JAR will be output to `build/` as `rpgtab-1.11.0-neoforge-1.21.1.jar`.
+The compiled JAR will be output to `build/` as `rpgtab-1.12.0-neoforge-1.21.1.jar`.

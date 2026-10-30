@@ -18,10 +18,14 @@ public class PlayerStatsEntry {
     private final int advancementsCount;
     private final int ftbQuestsCount;
     private final long playTimeTicks;
+    private final int loadedChunks;
+    private final int generatingChunks;
+    private final int dhGeneratingChunks;
 
     public PlayerStatsEntry(UUID uuid, String name, String teamName, boolean online, float health, float maxHealth,
                             int foodLevel, float saturation, int xpLevel, float xpProgress,
-                            int deaths, int advancementsCount, int ftbQuestsCount, long playTimeTicks) {
+                            int deaths, int advancementsCount, int ftbQuestsCount, long playTimeTicks,
+                            int loadedChunks, int generatingChunks, int dhGeneratingChunks) {
         this.uuid = uuid != null ? uuid : new UUID(0L, 0L);
         this.name = name != null && !name.trim().isEmpty() ? name : "Unknown";
         this.teamName = teamName != null ? teamName : "";
@@ -36,6 +40,16 @@ public class PlayerStatsEntry {
         this.advancementsCount = Math.max(0, advancementsCount);
         this.ftbQuestsCount = Math.max(0, ftbQuestsCount);
         this.playTimeTicks = Math.max(0L, playTimeTicks);
+        this.loadedChunks = Math.max(0, loadedChunks);
+        this.generatingChunks = Math.max(0, generatingChunks);
+        this.dhGeneratingChunks = Math.max(0, dhGeneratingChunks);
+    }
+
+    public PlayerStatsEntry(UUID uuid, String name, String teamName, boolean online, float health, float maxHealth,
+                            int foodLevel, float saturation, int xpLevel, float xpProgress,
+                            int deaths, int advancementsCount, int ftbQuestsCount, long playTimeTicks) {
+        this(uuid, name, teamName, online, health, maxHealth, foodLevel, saturation, xpLevel, xpProgress,
+                deaths, advancementsCount, ftbQuestsCount, playTimeTicks, 0, 0, 0);
     }
 
     public UUID getUuid() {
@@ -94,6 +108,18 @@ public class PlayerStatsEntry {
         return playTimeTicks;
     }
 
+    public int getLoadedChunks() {
+        return loadedChunks;
+    }
+
+    public int getGeneratingChunks() {
+        return generatingChunks;
+    }
+
+    public int getDhGeneratingChunks() {
+        return dhGeneratingChunks;
+    }
+
     public String getFormattedPlayTime() {
         long totalSeconds = Math.max(0L, playTimeTicks) / 20L;
         long days = totalSeconds / 86400L;
@@ -108,6 +134,18 @@ public class PlayerStatsEntry {
         } else {
             return minutes + "m";
         }
+    }
+
+    public String getFormattedLoadedChunks() {
+        return online ? String.valueOf(loadedChunks) : "-";
+    }
+
+    public String getFormattedGeneratingChunks() {
+        if (!online) return "-";
+        if (dhGeneratingChunks > 0) {
+            return generatingChunks + " (DH:" + dhGeneratingChunks + ")";
+        }
+        return String.valueOf(generatingChunks);
     }
 
     public void write(RegistryFriendlyByteBuf buf) {
@@ -125,6 +163,9 @@ public class PlayerStatsEntry {
         buf.writeVarInt(advancementsCount);
         buf.writeVarInt(ftbQuestsCount);
         buf.writeVarLong(playTimeTicks);
+        buf.writeVarInt(loadedChunks);
+        buf.writeVarInt(generatingChunks);
+        buf.writeVarInt(dhGeneratingChunks);
     }
 
     public static PlayerStatsEntry read(RegistryFriendlyByteBuf buf) {
@@ -142,7 +183,11 @@ public class PlayerStatsEntry {
         int advancementsCount = buf.readVarInt();
         int ftbQuestsCount = buf.readVarInt();
         long playTimeTicks = buf.readVarLong();
+        int loadedChunks = buf.readVarInt();
+        int generatingChunks = buf.readVarInt();
+        int dhGeneratingChunks = buf.readVarInt();
         return new PlayerStatsEntry(uuid, name, teamName, online, health, maxHealth, foodLevel, saturation,
-                xpLevel, xpProgress, deaths, advancementsCount, ftbQuestsCount, playTimeTicks);
+                xpLevel, xpProgress, deaths, advancementsCount, ftbQuestsCount, playTimeTicks,
+                loadedChunks, generatingChunks, dhGeneratingChunks);
     }
 }
