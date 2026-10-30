@@ -30,8 +30,7 @@ public class RpgTabServerConfig {
     public final ModConfigSpec.BooleanValue showPlayTime;
     public final ModConfigSpec.BooleanValue showPing;
     public final ModConfigSpec.BooleanValue showFps;
-    public final ModConfigSpec.BooleanValue showLoadedChunks;
-    public final ModConfigSpec.BooleanValue showGeneratingChunks;
+    public final ModConfigSpec.BooleanValue showDimension;
 
     // Métriques serveur (Footer)
     public final ModConfigSpec.BooleanValue showServerFooter;
@@ -40,6 +39,7 @@ public class RpgTabServerConfig {
     public final ModConfigSpec.BooleanValue showServerTps;
     public final ModConfigSpec.BooleanValue showServerUptime;
     public final ModConfigSpec.BooleanValue showServerNetwork;
+    public final ModConfigSpec.BooleanValue showServerChunks;
     public final ModConfigSpec.BooleanValue showServerGpu;
     public final ModConfigSpec.BooleanValue showServerDh;
     public final ModConfigSpec.BooleanValue showServerSeedGen;
@@ -74,8 +74,7 @@ public class RpgTabServerConfig {
         showPlayTime = builder.comment("Afficher le temps de jeu sur le serveur").define("showPlayTime", true);
         showPing = builder.comment("Afficher le ping / latence").define("showPing", true);
         showFps = builder.comment("Afficher les FPS du client en haut a droite du menu TAB (compatible GGTU)").define("showFps", true);
-        showLoadedChunks = builder.comment("Afficher le nombre de chunks charges par le joueur").define("showLoadedChunks", false);
-        showGeneratingChunks = builder.comment("Afficher le nombre de chunks generes / en attente (vanilla + DH)").define("showGeneratingChunks", false);
+        showDimension = builder.comment("Afficher la dimension actuelle du joueur (Overworld, Nether, End, etc.)").define("showDimension", true);
         builder.pop();
 
         builder.push("server_metrics");
@@ -85,6 +84,7 @@ public class RpgTabServerConfig {
         showServerRam = builder.comment("Afficher l'utilisation de la RAM du serveur").define("showServerRam", true);
         showServerUptime = builder.comment("Afficher le temps de fonctionnement (uptime) du serveur depuis le reboot").define("showServerUptime", true);
         showServerNetwork = builder.comment("Afficher le debit reseau du serveur (DL et UL)").define("showServerNetwork", true);
+        showServerChunks = builder.comment("Afficher le nombre de chunks charges et en generation sur le serveur").define("showServerChunks", true);
         showServerGpu = builder.comment("Afficher le GPU du serveur et l'etat d'acceleration C2ME OpenCL").define("showServerGpu", true);
         showServerDh = builder.comment("Afficher le statut Distant Horizons cote serveur").define("showServerDh", true);
         showServerSeedGen = builder.comment("Afficher le statut SeedGen cote serveur").define("showServerSeedGen", true);

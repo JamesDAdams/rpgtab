@@ -7,13 +7,16 @@ public class ServerHardwareStats implements Serializable {
 
     private final float tps;
     private final float mspt;
-    private final double cpuUsage; // e.g. 200.0
-    private final int maxCpuPercent; // e.g. 600
+    private final double cpuUsage;
+    private final int maxCpuPercent;
     private final long usedRamBytes;
     private final long maxRamBytes;
     private final long uptimeSeconds;
     private final long downloadBytesPerSec;
     private final long uploadBytesPerSec;
+    private final int totalLoadedChunks;
+    private final int totalGeneratingChunks;
+    private final int dhGeneratingChunks;
     private final boolean c2meOpenclLoaded;
     private final boolean dhLoaded;
     private final boolean seedGenLoaded;
@@ -22,6 +25,7 @@ public class ServerHardwareStats implements Serializable {
     public ServerHardwareStats(float tps, float mspt, double cpuUsage, int maxCpuPercent,
                                long usedRamBytes, long maxRamBytes, long uptimeSeconds,
                                long downloadBytesPerSec, long uploadBytesPerSec,
+                               int totalLoadedChunks, int totalGeneratingChunks, int dhGeneratingChunks,
                                boolean c2meOpenclLoaded, boolean dhLoaded, boolean seedGenLoaded,
                                String gpuName) {
         this.tps = tps;
@@ -33,6 +37,9 @@ public class ServerHardwareStats implements Serializable {
         this.uptimeSeconds = uptimeSeconds;
         this.downloadBytesPerSec = downloadBytesPerSec;
         this.uploadBytesPerSec = uploadBytesPerSec;
+        this.totalLoadedChunks = Math.max(0, totalLoadedChunks);
+        this.totalGeneratingChunks = Math.max(0, totalGeneratingChunks);
+        this.dhGeneratingChunks = Math.max(0, dhGeneratingChunks);
         this.c2meOpenclLoaded = c2meOpenclLoaded;
         this.dhLoaded = dhLoaded;
         this.seedGenLoaded = seedGenLoaded;
@@ -75,6 +82,18 @@ public class ServerHardwareStats implements Serializable {
         return uploadBytesPerSec;
     }
 
+    public int getTotalLoadedChunks() {
+        return totalLoadedChunks;
+    }
+
+    public int getTotalGeneratingChunks() {
+        return totalGeneratingChunks;
+    }
+
+    public int getDhGeneratingChunks() {
+        return dhGeneratingChunks;
+    }
+
     public boolean isC2meOpenclLoaded() {
         return c2meOpenclLoaded;
     }
@@ -93,6 +112,16 @@ public class ServerHardwareStats implements Serializable {
 
     public String getFormattedCpu() {
         return String.format("%.0f%%/%d%%", cpuUsage, maxCpuPercent);
+    }
+
+    public String getFormattedChunks() {
+        if (dhGeneratingChunks > 0) {
+            return totalLoadedChunks + " loaded (Gen: " + totalGeneratingChunks + " + DH:" + dhGeneratingChunks + ")";
+        } else if (totalGeneratingChunks > 0) {
+            return totalLoadedChunks + " loaded (Gen: " + totalGeneratingChunks + ")";
+        } else {
+            return totalLoadedChunks + " loaded";
+        }
     }
 
     public String getFormattedUptime() {
@@ -137,6 +166,9 @@ public class ServerHardwareStats implements Serializable {
         buf.writeLong(uptimeSeconds);
         buf.writeLong(downloadBytesPerSec);
         buf.writeLong(uploadBytesPerSec);
+        buf.writeVarInt(totalLoadedChunks);
+        buf.writeVarInt(totalGeneratingChunks);
+        buf.writeVarInt(dhGeneratingChunks);
         buf.writeBoolean(c2meOpenclLoaded);
         buf.writeBoolean(dhLoaded);
         buf.writeBoolean(seedGenLoaded);
@@ -153,10 +185,14 @@ public class ServerHardwareStats implements Serializable {
         long uptime = buf.readLong();
         long dl = buf.readLong();
         long ul = buf.readLong();
+        int loadedChunks = buf.readVarInt();
+        int genChunks = buf.readVarInt();
+        int dhGenChunks = buf.readVarInt();
         boolean c2me = buf.readBoolean();
         boolean dh = buf.readBoolean();
         boolean seedGen = buf.readBoolean();
         String gpu = buf.readUtf();
-        return new ServerHardwareStats(tps, mspt, cpu, maxCpu, usedRam, maxRam, uptime, dl, ul, c2me, dh, seedGen, gpu);
+        return new ServerHardwareStats(tps, mspt, cpu, maxCpu, usedRam, maxRam, uptime, dl, ul,
+                loadedChunks, genChunks, dhGenChunks, c2me, dh, seedGen, gpu);
     }
 }

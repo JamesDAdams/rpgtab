@@ -1,45 +1,38 @@
 package com.rpgtab.server;
 
 import java.util.Collection;
-import net.minecraft.server.level.ChunkTrackingView;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 
 public class ChunkStatsCollector {
 
-    public static int getLoadedChunksCount(ServerPlayer player) {
-        if (player == null) return 0;
+    public static int getTotalLoadedChunks(MinecraftServer server) {
+        if (server == null) return 0;
+        int total = 0;
         try {
-            ChunkTrackingView view = player.getChunkTrackingView();
-            if (view != null) {
-                int[] count = new int[1];
-                view.forEach(pos -> count[0]++);
-                if (count[0] > 0) {
-                    return count[0];
+            for (ServerLevel level : server.getAllLevels()) {
+                if (level.getChunkSource() != null) {
+                    total += level.getChunkSource().getLoadedChunksCount();
                 }
             }
-            int vd = player.requestedViewDistance();
-            if (vd > 0) {
-                int diameter = (vd * 2) + 1;
-                return diameter * diameter;
-            }
         } catch (Throwable ignored) {}
-        return 0;
+        return total;
     }
 
-    public static int getGeneratingChunksCount(ServerPlayer player) {
-        if (player == null) return 0;
+    public static int getTotalGeneratingChunks(MinecraftServer server) {
+        if (server == null) return 0;
+        int total = 0;
         try {
-            ServerLevel level = player.serverLevel();
-            if (level != null && level.getChunkSource() != null) {
-                return Math.max(0, level.getChunkSource().getPendingTasksCount());
+            for (ServerLevel level : server.getAllLevels()) {
+                if (level.getChunkSource() != null) {
+                    total += level.getChunkSource().getPendingTasksCount();
+                }
             }
         } catch (Throwable ignored) {}
-        return 0;
+        return total;
     }
 
-    public static int getDhGeneratingChunksCount(ServerPlayer player) {
-        if (player == null) return 0;
+    public static int getDhGeneratingChunksCount() {
         try {
             Class<?> dhQueueClass = Class.forName("com.seibel.distanthorizons.core.generation.queues.WorldGenerationQueue");
             java.lang.reflect.Field instancesField = null;

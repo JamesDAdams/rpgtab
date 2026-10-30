@@ -60,14 +60,16 @@ public class ServerStatsCollector {
             teamName = player.getTeam().getDisplayName().getString();
         }
 
-        int loadedChunks = ChunkStatsCollector.getLoadedChunksCount(player);
-        int generatingChunks = ChunkStatsCollector.getGeneratingChunksCount(player);
-        int dhGeneratingChunks = ChunkStatsCollector.getDhGeneratingChunksCount(player);
+        String dimension = "";
+        try {
+            dimension = player.serverLevel().dimension().location().getPath();
+        } catch (Throwable ignored) {}
 
         return new PlayerStatsEntry(
                 player.getUUID(),
                 player.getGameProfile().getName(),
                 teamName,
+                dimension,
                 true,
                 health,
                 maxHealth,
@@ -78,10 +80,7 @@ public class ServerStatsCollector {
                 deaths,
                 advancementsCount,
                 ftbQuests,
-                playTime,
-                loadedChunks,
-                generatingChunks,
-                dhGeneratingChunks
+                playTime
         );
     }
 
@@ -124,6 +123,7 @@ public class ServerStatsCollector {
                 uuid,
                 name,
                 teamName,
+                "",
                 false,
                 20.0f,
                 20.0f,
@@ -134,10 +134,7 @@ public class ServerStatsCollector {
                 deaths,
                 advancementsCount,
                 ftbQuests,
-                playTime,
-                0,
-                0,
-                0
+                playTime
         );
     }
 

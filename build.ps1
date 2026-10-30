@@ -11,7 +11,7 @@ $ecjJar = Join-Path $templateDir "build_tools\ecj.jar"
 
 $buildDir = Join-Path $rpgTabDir "build"
 $classesDir = Join-Path $buildDir "classes"
-$jarOut = Join-Path $buildDir "rpgtab-1.13.0-neoforge-1.21.1.jar"
+$jarOut = Join-Path $buildDir "rpgtab-1.14.0-neoforge-1.21.1.jar"
 
 if (Test-Path $buildDir) {
     Remove-Item $buildDir -Recurse -Force
@@ -96,7 +96,7 @@ $archive.Dispose()
 $zipStream.Close()
 Write-Output "Jar built: $jarOut ($((Get-Item $jarOut).Length) bytes)"
 
-$deployedJar = Join-Path $templateDir "mods\rpgtab-1.13.0-neoforge-1.21.1.jar"
+$deployedJar = Join-Path $templateDir "mods\rpgtab-1.14.0-neoforge-1.21.1.jar"
 $oldJars = Get-ChildItem -Path (Join-Path $templateDir "mods") -Filter "rpgtab-*.jar"
 foreach ($old in $oldJars) {
     Remove-Item $old.FullName -Force

@@ -7,6 +7,7 @@ public class PlayerStatsEntry {
     private final UUID uuid;
     private final String name;
     private final String teamName;
+    private final String dimension;
     private final boolean online;
     private final float health;
     private final float maxHealth;
@@ -18,17 +19,15 @@ public class PlayerStatsEntry {
     private final int advancementsCount;
     private final int ftbQuestsCount;
     private final long playTimeTicks;
-    private final int loadedChunks;
-    private final int generatingChunks;
-    private final int dhGeneratingChunks;
 
-    public PlayerStatsEntry(UUID uuid, String name, String teamName, boolean online, float health, float maxHealth,
-                            int foodLevel, float saturation, int xpLevel, float xpProgress,
-                            int deaths, int advancementsCount, int ftbQuestsCount, long playTimeTicks,
-                            int loadedChunks, int generatingChunks, int dhGeneratingChunks) {
+    public PlayerStatsEntry(UUID uuid, String name, String teamName, String dimension, boolean online,
+                            float health, float maxHealth, int foodLevel, float saturation,
+                            int xpLevel, float xpProgress, int deaths, int advancementsCount,
+                            int ftbQuestsCount, long playTimeTicks) {
         this.uuid = uuid != null ? uuid : new UUID(0L, 0L);
         this.name = name != null && !name.trim().isEmpty() ? name : "Unknown";
         this.teamName = teamName != null ? teamName : "";
+        this.dimension = dimension != null ? dimension : "";
         this.online = online;
         this.health = Math.max(0.0f, health);
         this.maxHealth = Math.max(1.0f, maxHealth);
@@ -40,16 +39,14 @@ public class PlayerStatsEntry {
         this.advancementsCount = Math.max(0, advancementsCount);
         this.ftbQuestsCount = Math.max(0, ftbQuestsCount);
         this.playTimeTicks = Math.max(0L, playTimeTicks);
-        this.loadedChunks = Math.max(0, loadedChunks);
-        this.generatingChunks = Math.max(0, generatingChunks);
-        this.dhGeneratingChunks = Math.max(0, dhGeneratingChunks);
     }
 
-    public PlayerStatsEntry(UUID uuid, String name, String teamName, boolean online, float health, float maxHealth,
-                            int foodLevel, float saturation, int xpLevel, float xpProgress,
-                            int deaths, int advancementsCount, int ftbQuestsCount, long playTimeTicks) {
-        this(uuid, name, teamName, online, health, maxHealth, foodLevel, saturation, xpLevel, xpProgress,
-                deaths, advancementsCount, ftbQuestsCount, playTimeTicks, 0, 0, 0);
+    public PlayerStatsEntry(UUID uuid, String name, String teamName, boolean online,
+                            float health, float maxHealth, int foodLevel, float saturation,
+                            int xpLevel, float xpProgress, int deaths, int advancementsCount,
+                            int ftbQuestsCount, long playTimeTicks) {
+        this(uuid, name, teamName, "Overworld", online, health, maxHealth, foodLevel, saturation,
+                xpLevel, xpProgress, deaths, advancementsCount, ftbQuestsCount, playTimeTicks);
     }
 
     public UUID getUuid() {
@@ -62,6 +59,10 @@ public class PlayerStatsEntry {
 
     public String getTeamName() {
         return teamName;
+    }
+
+    public String getDimension() {
+        return dimension;
     }
 
     public boolean isOnline() {
@@ -108,16 +109,25 @@ public class PlayerStatsEntry {
         return playTimeTicks;
     }
 
-    public int getLoadedChunks() {
-        return loadedChunks;
-    }
-
-    public int getGeneratingChunks() {
-        return generatingChunks;
-    }
-
-    public int getDhGeneratingChunks() {
-        return dhGeneratingChunks;
+    public String getFormattedDimension() {
+        if (!online || dimension.isEmpty()) return "-";
+        String dimLower = dimension.toLowerCase();
+        if (dimLower.contains("overworld")) {
+            return "§aOverworld";
+        } else if (dimLower.contains("nether")) {
+            return "§cNether";
+        } else if (dimLower.contains("the_end") || dimLower.contains("end")) {
+            return "§dEnd";
+        } else {
+            String shortName = dimension;
+            if (shortName.contains(":")) {
+                shortName = shortName.substring(shortName.indexOf(':') + 1);
+            }
+            if (shortName.length() > 10) {
+                shortName = shortName.substring(0, 10);
+            }
+            return "§b" + shortName;
+        }
     }
 
     public String getFormattedPlayTime() {
@@ -136,22 +146,11 @@ public class PlayerStatsEntry {
         }
     }
 
-    public String getFormattedLoadedChunks() {
-        return online ? String.valueOf(loadedChunks) : "-";
-    }
-
-    public String getFormattedGeneratingChunks() {
-        if (!online) return "-";
-        if (dhGeneratingChunks > 0) {
-            return generatingChunks + " (DH:" + dhGeneratingChunks + ")";
-        }
-        return String.valueOf(generatingChunks);
-    }
-
     public void write(RegistryFriendlyByteBuf buf) {
         buf.writeUUID(uuid);
         buf.writeUtf(name);
         buf.writeUtf(teamName);
+        buf.writeUtf(dimension);
         buf.writeBoolean(online);
         buf.writeFloat(health);
         buf.writeFloat(maxHealth);
@@ -163,15 +162,13 @@ public class PlayerStatsEntry {
         buf.writeVarInt(advancementsCount);
         buf.writeVarInt(ftbQuestsCount);
         buf.writeVarLong(playTimeTicks);
-        buf.writeVarInt(loadedChunks);
-        buf.writeVarInt(generatingChunks);
-        buf.writeVarInt(dhGeneratingChunks);
     }
 
     public static PlayerStatsEntry read(RegistryFriendlyByteBuf buf) {
         UUID uuid = buf.readUUID();
         String name = buf.readUtf();
         String teamName = buf.readUtf();
+        String dimension = buf.readUtf();
         boolean online = buf.readBoolean();
         float health = buf.readFloat();
         float maxHealth = buf.readFloat();
@@ -183,11 +180,7 @@ public class PlayerStatsEntry {
         int advancementsCount = buf.readVarInt();
         int ftbQuestsCount = buf.readVarInt();
         long playTimeTicks = buf.readVarLong();
-        int loadedChunks = buf.readVarInt();
-        int generatingChunks = buf.readVarInt();
-        int dhGeneratingChunks = buf.readVarInt();
-        return new PlayerStatsEntry(uuid, name, teamName, online, health, maxHealth, foodLevel, saturation,
-                xpLevel, xpProgress, deaths, advancementsCount, ftbQuestsCount, playTimeTicks,
-                loadedChunks, generatingChunks, dhGeneratingChunks);
+        return new PlayerStatsEntry(uuid, name, teamName, dimension, online, health, maxHealth, foodLevel, saturation,
+                xpLevel, xpProgress, deaths, advancementsCount, ftbQuestsCount, playTimeTicks);
     }
 }

@@ -29,6 +29,7 @@ public class RpgTabRenderer {
 
     private static final int COL_AVATAR = 22;
     private static final int COL_NAME = 100;
+    private static final int COL_DIM = 65;
     private static final int COL_HEALTH = 95;
     private static final int COL_FOOD = 55;
     private static final int COL_XP = 50;
@@ -36,8 +37,6 @@ public class RpgTabRenderer {
     private static final int COL_QUESTS = 48;
     private static final int COL_ADV = 48;
     private static final int COL_PLAYTIME = 55;
-    private static final int COL_CHUNKS = 45;
-    private static final int COL_GEN = 48;
     private static final int COL_PING = 42;
 
     public static void render(GuiGraphics graphics) {
@@ -108,6 +107,7 @@ public class RpgTabRenderer {
         // Calcul dynamique de la largeur selon les colonnes actives
         int computedWidth = COL_NAME;
         if (cfg.showAvatar) computedWidth += COL_AVATAR;
+        if (cfg.showDimension) computedWidth += COL_DIM;
         if (cfg.showHealth) computedWidth += COL_HEALTH;
         if (cfg.showFood) computedWidth += COL_FOOD;
         if (cfg.showXp) computedWidth += COL_XP;
@@ -115,8 +115,6 @@ public class RpgTabRenderer {
         if (cfg.showFtbQuests) computedWidth += COL_QUESTS;
         if (cfg.showAdvancements) computedWidth += COL_ADV;
         if (cfg.showPlayTime) computedWidth += COL_PLAYTIME;
-        if (cfg.showLoadedChunks) computedWidth += COL_CHUNKS;
-        if (cfg.showGeneratingChunks) computedWidth += COL_GEN;
         if (cfg.showPing) computedWidth += COL_PING;
         computedWidth += (PADDING_X * 2);
 
@@ -182,6 +180,11 @@ public class RpgTabRenderer {
         graphics.drawString(font, "Player", currentX + 2, colY, 0xFFC0C0C0, false);
         currentX += COL_NAME;
 
+        if (cfg.showDimension) {
+            graphics.drawString(font, "✦ Dim", currentX + 2, colY, 0xFF93C5FD, false);
+            currentX += COL_DIM;
+        }
+
         if (cfg.showHealth) {
             graphics.drawString(font, "\u2764 Health", currentX + 2, colY, cfg.healthColor, false);
             currentX += COL_HEALTH;
@@ -209,14 +212,6 @@ public class RpgTabRenderer {
         if (cfg.showPlayTime) {
             graphics.drawString(font, "\u23F1 Time", currentX + 2, colY, cfg.playTimeColor, false);
             currentX += COL_PLAYTIME;
-        }
-        if (cfg.showLoadedChunks) {
-            graphics.drawString(font, "☵ Chunks", currentX + 2, colY, 0xFF6EE7B7, false);
-            currentX += COL_CHUNKS;
-        }
-        if (cfg.showGeneratingChunks) {
-            graphics.drawString(font, "⚙ Gen", currentX + 2, colY, 0xFFFBBF24, false);
-            currentX += COL_GEN;
         }
         if (cfg.showPing) {
             graphics.drawString(font, "\u25CE Ping", currentX + 2, colY, 0xFF88AAFF, false);
@@ -271,6 +266,9 @@ public class RpgTabRenderer {
             parts.add(String.format("§d🌐 Net: §f↓ %s ↑ %s",
                     com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getDownloadBytesPerSec()),
                     com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getUploadBytesPerSec())));
+        }
+        if (cfg.showServerChunks) {
+            parts.add("§2☵ " + stats.getFormattedChunks());
         }
         if (cfg.showServerUptime) {
             parts.add("§6⏱ Up: §f" + stats.getFormattedUptime());
@@ -359,7 +357,14 @@ public class RpgTabRenderer {
         }
         currX += COL_NAME;
 
-        // 3. Barre de vie avec texte DANS la barre de vie
+        // 3. Dimension
+        if (cfg.showDimension) {
+            String dimStr = entry.getFormattedDimension();
+            graphics.drawString(font, dimStr, currX + 2, textY, 0xFFFFFFFF, false);
+            currX += COL_DIM;
+        }
+
+        // 4. Barre de vie avec texte DANS la barre de vie
         if (cfg.showHealth) {
             float hp = isOnline ? entry.getHealth() : 0.0f;
             float maxHp = Math.max(1.0f, entry.getMaxHealth());
@@ -431,19 +436,7 @@ public class RpgTabRenderer {
             currX += COL_PLAYTIME;
         }
 
-        // 10. Chunks chargés
-        if (cfg.showLoadedChunks) {
-            graphics.drawString(font, entry.getFormattedLoadedChunks(), currX + 4, textY, isOnline ? 0xFF6EE7B7 : 0xFF777777, false);
-            currX += COL_CHUNKS;
-        }
-
-        // 11. Chunks en génération
-        if (cfg.showGeneratingChunks) {
-            graphics.drawString(font, entry.getFormattedGeneratingChunks(), currX + 4, textY, isOnline ? 0xFFFBBF24 : 0xFF777777, false);
-            currX += COL_GEN;
-        }
-
-        // 12. Ping
+        // 10. Ping
         if (cfg.showPing) {
             if (info != null) {
                 int ping = info.getLatency();

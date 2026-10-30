@@ -16,6 +16,7 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
 - **Comprehensive Player Stats**:
   - **Player Avatar**: Dynamic player skin head rendering.
   - **FTB Team Name**: Displays the player's FTB Team name in italics directly below their username (e.g., *MyTeam*) only when the player belongs to a team.
+  - **Player Dimension**: Displays each player's current dimension (Overworld, Nether, End, or custom mod dimension).
   - **Dynamic Health Bar**: Visual fill bar with exact numerical HP centered inside (e.g., `24/24`) and smooth color adaptation (green > orange > red).
   - **Food Level**: Hunger points displayed as `20/20`.
   - **XP Level**: Experience level formatted as `Lvl X`.
@@ -23,8 +24,6 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
   - **FTB Quests**: Total completed quests per team/player (safe reflection fallback if FTB Quests is not installed).
   - **Advancements**: Unlocked achievements count (crafting recipes are filtered out).
   - **Server Play Time**: Formatted total playtime (e.g., `2h 15m`).
-  - **Loaded Chunks**: Number of world chunks actively tracked and loaded by each player.
-  - **Generating Chunks**: Number of world chunks currently generating or pending generation in real-time (including vanilla and Distant Horizons tasks).
   - **Latency / Ping**: Color-coded ping in milliseconds.
 - **Offline Players Support**:
   - Displays data for previously connected players who are currently offline (play time, deaths, FTB quests, and JSON advancements).
@@ -39,6 +38,7 @@ A clean, highly customizable RPG-themed player list (TAB menu) replacement for M
   - Server **CPU usage** percentage formatted against container allocated cores (e.g. `200%/600%`).
   - Allocated & container cgroup **RAM** usage (e.g. `1.7 Go / 16.0 Go`).
   - Container-level **Network transfer rates** (DL and UL in Ko/s or Mo/s via `/proc/net/dev`).
+  - Real-time **Server Chunks**: Total loaded chunks on the server and real-time generating chunks (Vanilla + Distant Horizons).
   - Server **Uptime** since last reboot (⏱ Up:).
   - **GPU, C2ME OpenCL, Distant Horizons & SeedGen detection**: Displays the connected GPU name, C2ME OpenCL status, and Distant Horizons / SeedGen integration status.
   - Configurable server toggles in `config/rpgtab-server.toml` (`[server_metrics]`).
@@ -67,4 +67,4 @@ Requires Java 21 LTS (OpenJDK or Zulu):
 ```powershell
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
-The compiled JAR will be output to `build/` as `rpgtab-1.13.0-neoforge-1.21.1.jar`.
+The compiled JAR will be output to `build/` as `rpgtab-1.14.0-neoforge-1.21.1.jar`.

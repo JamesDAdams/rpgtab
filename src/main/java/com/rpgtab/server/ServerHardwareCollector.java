@@ -212,7 +212,6 @@ public class ServerHardwareCollector {
             if (osBean instanceof com.sun.management.OperatingSystemMXBean sunOsBean) {
                 double procLoad = sunOsBean.getProcessCpuLoad();
                 if (procLoad >= 0.0) {
-                    // procLoad is between 0.0 and 1.0 (relative to total CPU cores of JVM)
                     return procLoad * cores * 100.0;
                 }
             }
@@ -223,7 +222,7 @@ public class ServerHardwareCollector {
                 double load = (double) oshiProcessor.getClass().getMethod("getSystemCpuLoadBetweenTicks", long[].class)
                         .invoke(oshiProcessor, (Object) prevCpuTicks);
                 prevCpuTicks = (long[]) oshiProcessor.getClass().getMethod("getSystemCpuLoadTicks").invoke(oshiProcessor);
-                if (load >= 0.0) {
+                if (load >= 0) {
                     return load * cores * 100.0;
                 }
             } catch (Throwable ignored) {}
@@ -233,7 +232,6 @@ public class ServerHardwareCollector {
     }
 
     public static long[] getContainerMemory() {
-        // Returns [usedBytes, maxBytes]
         // 1. Try cgroup v2
         try {
             File curFile = new File("/sys/fs/cgroup/memory.current");
@@ -263,7 +261,6 @@ public class ServerHardwareCollector {
                 long max = 0;
                 if (maxFile.exists()) {
                     max = Long.parseLong(Files.readString(maxFile.toPath()).trim());
-                    // cgroup v1 huge number means no limit
                     if (max > 1L << 50) {
                         max = Runtime.getRuntime().maxMemory();
                     }
@@ -275,7 +272,6 @@ public class ServerHardwareCollector {
             }
         } catch (Throwable ignored) {}
 
-        // Fallback: Java Runtime
         Runtime rt = Runtime.getRuntime();
         long used = rt.totalMemory() - rt.freeMemory();
         long max = rt.maxMemory();
@@ -285,7 +281,7 @@ public class ServerHardwareCollector {
     public static void updateNetworkSpeeds() {
         long now = System.currentTimeMillis();
 
-        // 1. Try reading Linux /proc/net/dev (Pelican / Docker container eth0)
+        // 1. Try reading Linux /proc/net/dev
         try {
             File netDev = new File("/proc/net/dev");
             if (netDev.exists()) {
@@ -381,12 +377,17 @@ public class ServerHardwareCollector {
 
         updateNetworkSpeeds();
 
+        int totalLoadedChunks = ChunkStatsCollector.getTotalLoadedChunks(server);
+        int totalGeneratingChunks = ChunkStatsCollector.getTotalGeneratingChunks(server);
+        int dhGeneratingChunks = ChunkStatsCollector.getDhGeneratingChunksCount();
+
         boolean c2me = isC2meOpenclLoaded();
         boolean dh = isDhLoaded();
         boolean seedGen = isSeedGenLoaded();
         String gpu = getGpuName();
 
         return new ServerHardwareStats(tps, mspt, cpu, maxCpuPercent, usedRam, maxRam, uptimeSec,
-                curDlSpeed, curUlSpeed, c2me, dh, seedGen, gpu);
+                curDlSpeed, curUlSpeed, totalLoadedChunks, totalGeneratingChunks, dhGeneratingChunks,
+                c2me, dh, seedGen, gpu);
     }
 }

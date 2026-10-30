@@ -19,8 +19,7 @@ public class RpgTabConfigData {
     public boolean showPlayTime = true;
     public boolean showPing = true;
     public boolean showFps = true;
-    public boolean showLoadedChunks = false;
-    public boolean showGeneratingChunks = false;
+    public boolean showDimension = true;
 
     // Métriques serveur (Footer)
     public boolean showServerFooter = true;
@@ -29,6 +28,7 @@ public class RpgTabConfigData {
     public boolean showServerRam = true;
     public boolean showServerUptime = true;
     public boolean showServerNetwork = true;
+    public boolean showServerChunks = true;
     public boolean showServerGpu = true;
     public boolean showServerDh = true;
     public boolean showServerSeedGen = true;
@@ -79,8 +79,7 @@ public class RpgTabConfigData {
         data.showPlayTime = RpgTabServerConfig.CONFIG.showPlayTime.get();
         data.showPing = RpgTabServerConfig.CONFIG.showPing.get();
         data.showFps = RpgTabServerConfig.CONFIG.showFps.get();
-        data.showLoadedChunks = RpgTabServerConfig.CONFIG.showLoadedChunks.get();
-        data.showGeneratingChunks = RpgTabServerConfig.CONFIG.showGeneratingChunks.get();
+        data.showDimension = RpgTabServerConfig.CONFIG.showDimension.get();
 
         data.showServerFooter = RpgTabServerConfig.CONFIG.showServerFooter.get();
         data.showServerTps = RpgTabServerConfig.CONFIG.showServerTps.get();
@@ -88,6 +87,7 @@ public class RpgTabConfigData {
         data.showServerRam = RpgTabServerConfig.CONFIG.showServerRam.get();
         data.showServerUptime = RpgTabServerConfig.CONFIG.showServerUptime.get();
         data.showServerNetwork = RpgTabServerConfig.CONFIG.showServerNetwork.get();
+        data.showServerChunks = RpgTabServerConfig.CONFIG.showServerChunks.get();
         data.showServerGpu = RpgTabServerConfig.CONFIG.showServerGpu.get();
         data.showServerDh = RpgTabServerConfig.CONFIG.showServerDh.get();
         data.showServerSeedGen = RpgTabServerConfig.CONFIG.showServerSeedGen.get();
@@ -118,8 +118,7 @@ public class RpgTabConfigData {
         buf.writeBoolean(showPlayTime);
         buf.writeBoolean(showPing);
         buf.writeBoolean(showFps);
-        buf.writeBoolean(showLoadedChunks);
-        buf.writeBoolean(showGeneratingChunks);
+        buf.writeBoolean(showDimension);
 
         buf.writeBoolean(showServerFooter);
         buf.writeBoolean(showServerTps);
@@ -127,6 +126,7 @@ public class RpgTabConfigData {
         buf.writeBoolean(showServerRam);
         buf.writeBoolean(showServerUptime);
         buf.writeBoolean(showServerNetwork);
+        buf.writeBoolean(showServerChunks);
         buf.writeBoolean(showServerGpu);
         buf.writeBoolean(showServerDh);
         buf.writeBoolean(showServerSeedGen);
@@ -156,8 +156,7 @@ public class RpgTabConfigData {
         data.showPlayTime = buf.readBoolean();
         data.showPing = buf.readBoolean();
         data.showFps = buf.readBoolean();
-        data.showLoadedChunks = buf.readBoolean();
-        data.showGeneratingChunks = buf.readBoolean();
+        data.showDimension = buf.readBoolean();
 
         data.showServerFooter = buf.readBoolean();
         data.showServerTps = buf.readBoolean();
@@ -165,6 +164,7 @@ public class RpgTabConfigData {
         data.showServerRam = buf.readBoolean();
         data.showServerUptime = buf.readBoolean();
         data.showServerNetwork = buf.readBoolean();
+        data.showServerChunks = buf.readBoolean();
         data.showServerGpu = buf.readBoolean();
         data.showServerDh = buf.readBoolean();
         data.showServerSeedGen = buf.readBoolean();

@@ -73,7 +73,7 @@ public class RpgTabUnitTests {
 
     private static void testPlayerStatsEntryAccessors() {
         UUID id = UUID.nameUUIDFromBytes("Player1".getBytes());
-        PlayerStatsEntry entry = new PlayerStatsEntry(id, "Player1", "", false, 20.0f, 20.0f, 20, 5.0f, 100, 0.0f, 0, 50, 100, 150000L, 441, 12, 4);
+        PlayerStatsEntry entry = new PlayerStatsEntry(id, "Player1", "", "overworld", false, 20.0f, 20.0f, 20, 5.0f, 100, 0.0f, 0, 50, 100, 150000L);
         if (!entry.getUuid().equals(id)) {
             throw new AssertionError("UUID mismatch");
         }
@@ -86,8 +86,8 @@ public class RpgTabUnitTests {
         if (!"2h 5m".equals(entry.getFormattedPlayTime())) {
             throw new AssertionError("Playtime formatting mismatch: " + entry.getFormattedPlayTime());
         }
-        if (entry.getLoadedChunks() != 441 || entry.getGeneratingChunks() != 12 || entry.getDhGeneratingChunks() != 4) {
-            throw new AssertionError("Chunk stats mismatch");
+        if (!"overworld".equals(entry.getDimension())) {
+            throw new AssertionError("Dimension mismatch: " + entry.getDimension());
         }
         System.out.println("[PASS] PlayerStatsEntry accessor tests");
     }
@@ -224,11 +224,9 @@ public class RpgTabUnitTests {
 
     private static void testConfigDataDefaultValues() {
         RpgTabConfigData data = new RpgTabConfigData();
-        if (!data.showOfflinePlayers || !data.showPlayTime || !data.showHealth || !data.showFps) {
+        if (!data.showOfflinePlayers || !data.showPlayTime || !data.showHealth || !data.showFps
+                || !data.showDimension || !data.showServerChunks) {
             throw new AssertionError("Default config values mismatch");
-        }
-        if (data.showLoadedChunks || data.showGeneratingChunks) {
-            throw new AssertionError("Chunk columns should be disabled by default to save width");
         }
         if (data.titleColor != RpgTabConstants.DEFAULT_TITLE_COLOR) {
             throw new AssertionError("Default titleColor mismatch");
@@ -276,7 +274,7 @@ public class RpgTabUnitTests {
     private static void testServerHardwareStats() {
         com.rpgtab.server.ServerHardwareStats stats = new com.rpgtab.server.ServerHardwareStats(
                 19.8f, 15.2f, 210.0, 600, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
-                90000L, 2500000L, 500000L, true, true, true, "NVIDIA GeForce RTX 4070"
+                90000L, 2500000L, 500000L, 850, 4, 12, true, true, true, "NVIDIA GeForce RTX 4070"
         );
         if (stats.getTps() != 19.8f || stats.getMspt() != 15.2f) {
             throw new AssertionError("TPS/MSPT mismatch");
@@ -286,6 +284,12 @@ public class RpgTabUnitTests {
         }
         if (!"210%/600%".equals(stats.getFormattedCpu())) {
             throw new AssertionError("CPU format mismatch: " + stats.getFormattedCpu());
+        }
+        if (stats.getTotalLoadedChunks() != 850 || stats.getTotalGeneratingChunks() != 4 || stats.getDhGeneratingChunks() != 12) {
+            throw new AssertionError("Server chunk stats mismatch");
+        }
+        if (!"850 loaded (Gen: 4 + DH:12)".equals(stats.getFormattedChunks())) {
+            throw new AssertionError("Formatted chunks mismatch: " + stats.getFormattedChunks());
         }
         if (!stats.isDhLoaded() || !stats.isSeedGenLoaded()) {
             throw new AssertionError("DH / SeedGen loaded flags mismatch");
