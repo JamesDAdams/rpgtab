@@ -39,6 +39,22 @@ public class FTBQuestsHelper {
         }
     }
 
+    public static String getTeamName(java.util.UUID uuid) {
+        try {
+            if (dev.ftb.mods.ftbteams.api.FTBTeamsAPI.api().isManagerLoaded()) {
+                java.util.Optional<dev.ftb.mods.ftbteams.api.Team> teamOpt = dev.ftb.mods.ftbteams.api.FTBTeamsAPI.api().getManager().getTeamForPlayerID(uuid);
+                if (teamOpt.isPresent()) {
+                    net.minecraft.network.chat.Component nameComp = teamOpt.get().getName();
+                    if (nameComp != null) {
+                        return nameComp.getString();
+                    }
+                    return teamOpt.get().getShortName();
+                }
+            }
+        } catch (Throwable ignored) {}
+        return "";
+    }
+
     private static class FTBQuestsReflection {
         public static int count(ServerPlayer player) {
             dev.ftb.mods.ftbquests.quest.ServerQuestFile file = dev.ftb.mods.ftbquests.quest.ServerQuestFile.INSTANCE;

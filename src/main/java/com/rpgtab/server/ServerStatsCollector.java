@@ -55,10 +55,12 @@ public class ServerStatsCollector {
         } catch (Throwable ignored) {}
 
         int ftbQuests = FTBQuestsHelper.getCompletedQuestsCount(player);
+        String teamName = FTBQuestsHelper.getTeamName(player.getUUID());
 
         return new PlayerStatsEntry(
                 player.getUUID(),
                 player.getGameProfile().getName(),
+                teamName,
                 true,
                 health,
                 maxHealth,
@@ -106,10 +108,12 @@ public class ServerStatsCollector {
         } catch (Throwable ignored) {}
 
         int ftbQuests = FTBQuestsHelper.getCompletedQuestsCount(uuid);
+        String teamName = FTBQuestsHelper.getTeamName(uuid);
 
         return new PlayerStatsEntry(
                 uuid,
                 name,
+                teamName,
                 false,
                 20.0f,
                 20.0f,

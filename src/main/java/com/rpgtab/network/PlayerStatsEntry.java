@@ -6,6 +6,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 public class PlayerStatsEntry {
     private final UUID uuid;
     private final String name;
+    private final String teamName;
     private final boolean online;
     private final float health;
     private final float maxHealth;
@@ -18,11 +19,12 @@ public class PlayerStatsEntry {
     private final int ftbQuestsCount;
     private final long playTimeTicks;
 
-    public PlayerStatsEntry(UUID uuid, String name, boolean online, float health, float maxHealth,
+    public PlayerStatsEntry(UUID uuid, String name, String teamName, boolean online, float health, float maxHealth,
                             int foodLevel, float saturation, int xpLevel, float xpProgress,
                             int deaths, int advancementsCount, int ftbQuestsCount, long playTimeTicks) {
         this.uuid = uuid;
         this.name = name != null ? name : "Unknown";
+        this.teamName = teamName != null ? teamName : "";
         this.online = online;
         this.health = health;
         this.maxHealth = maxHealth;
@@ -42,6 +44,10 @@ public class PlayerStatsEntry {
 
     public String getName() {
         return name;
+    }
+
+    public String getTeamName() {
+        return teamName;
     }
 
     public boolean isOnline() {
@@ -102,6 +108,7 @@ public class PlayerStatsEntry {
     public void write(RegistryFriendlyByteBuf buf) {
         buf.writeUUID(uuid);
         buf.writeUtf(name);
+        buf.writeUtf(teamName);
         buf.writeBoolean(online);
         buf.writeFloat(health);
         buf.writeFloat(maxHealth);
@@ -118,6 +125,7 @@ public class PlayerStatsEntry {
     public static PlayerStatsEntry read(RegistryFriendlyByteBuf buf) {
         UUID uuid = buf.readUUID();
         String name = buf.readUtf();
+        String teamName = buf.readUtf();
         boolean online = buf.readBoolean();
         float health = buf.readFloat();
         float maxHealth = buf.readFloat();
@@ -129,7 +137,7 @@ public class PlayerStatsEntry {
         int advancementsCount = buf.readVarInt();
         int ftbQuestsCount = buf.readVarInt();
         long playTimeTicks = buf.readVarLong();
-        return new PlayerStatsEntry(uuid, name, online, health, maxHealth, foodLevel, saturation,
+        return new PlayerStatsEntry(uuid, name, teamName, online, health, maxHealth, foodLevel, saturation,
                 xpLevel, xpProgress, deaths, advancementsCount, ftbQuestsCount, playTimeTicks);
     }
 }

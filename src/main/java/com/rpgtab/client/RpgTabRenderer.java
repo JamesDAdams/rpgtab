@@ -65,6 +65,7 @@ public class RpgTabRenderer {
             entryMap.put(mc.player.getUUID(), new PlayerStatsEntry(
                     mc.player.getUUID(),
                     mc.player.getGameProfile().getName(),
+                    "",
                     true,
                     mc.player.getHealth(),
                     mc.player.getMaxHealth(),
@@ -244,7 +245,7 @@ public class RpgTabRenderer {
             currX += COL_AVATAR;
         }
 
-        // 2. Nom du joueur
+        // 2. Nom du joueur & Nom de Team FTB
         String name = entry.getName();
         if (info != null && info.getTabListDisplayName() != null) {
             name = info.getTabListDisplayName().getString();
@@ -252,7 +253,16 @@ public class RpgTabRenderer {
         int nameColor = isSelf ? 0xFFFFD700 : (isOnline ? 0xFFFFFFFF : 0xFF777777);
         String suffix = isOnline ? "" : " (off)";
         String trimmedName = font.plainSubstrByWidth(name + suffix, COL_NAME - 10);
-        graphics.drawString(font, trimmedName, currX + 2, textY, nameColor, false);
+
+        String team = entry.getTeamName();
+        if (team != null && !team.trim().isEmpty()) {
+            // Afficher le nom et la team en dessous
+            graphics.drawString(font, trimmedName, currX + 2, y + 3, nameColor, false);
+            String trimmedTeam = font.plainSubstrByWidth("[" + team.trim() + "]", COL_NAME - 10);
+            graphics.drawString(font, trimmedTeam, currX + 2, y + 13, 0xFF9E9E9E, false);
+        } else {
+            graphics.drawString(font, trimmedName, currX + 2, textY, nameColor, false);
+        }
         currX += COL_NAME;
 
         // 3. Barre de vie avec texte DANS la barre de vie

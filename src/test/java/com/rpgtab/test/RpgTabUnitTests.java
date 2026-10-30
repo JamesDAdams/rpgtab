@@ -17,7 +17,7 @@ public class RpgTabUnitTests {
     private static void testClientStatsCache() {
         ClientStatsCache.clear();
         UUID id = UUID.randomUUID();
-        PlayerStatsEntry entry = new PlayerStatsEntry(id, "TestHero", true, 24.0f, 24.0f, 19, 5.0f, 42, 0.75f, 3, 15, 27, 72000L);
+        PlayerStatsEntry entry = new PlayerStatsEntry(id, "TestHero", "TeamAlpha", true, 24.0f, 24.0f, 19, 5.0f, 42, 0.75f, 3, 15, 27, 72000L);
         ClientStatsCache.update(entry);
 
         PlayerStatsEntry cached = ClientStatsCache.get(id);
@@ -29,6 +29,9 @@ public class RpgTabUnitTests {
         }
         if (!"TestHero".equals(cached.getName())) {
             throw new AssertionError("Unexpected name: " + cached.getName());
+        }
+        if (!"TeamAlpha".equals(cached.getTeamName())) {
+            throw new AssertionError("Unexpected team name: " + cached.getTeamName());
         }
         if (!"1h".equals(cached.getFormattedPlayTime())) {
             throw new AssertionError("Unexpected play time: " + cached.getFormattedPlayTime());
@@ -50,7 +53,7 @@ public class RpgTabUnitTests {
 
     private static void testPlayerStatsEntryAccessors() {
         UUID id = UUID.nameUUIDFromBytes("Player1".getBytes());
-        PlayerStatsEntry entry = new PlayerStatsEntry(id, "Player1", false, 20.0f, 20.0f, 20, 5.0f, 100, 0.0f, 0, 50, 100, 150000L);
+        PlayerStatsEntry entry = new PlayerStatsEntry(id, "Player1", "", false, 20.0f, 20.0f, 20, 5.0f, 100, 0.0f, 0, 50, 100, 150000L);
         if (!entry.getUuid().equals(id)) {
             throw new AssertionError("UUID mismatch");
         }
