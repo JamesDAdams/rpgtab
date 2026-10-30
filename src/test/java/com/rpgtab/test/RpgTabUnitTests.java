@@ -275,7 +275,7 @@ public class RpgTabUnitTests {
         com.rpgtab.server.ServerHardwareStats stats = new com.rpgtab.server.ServerHardwareStats(
                 19.8f, 15.2f, 210.0, 600, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
                 1L * 1024L * 1024L * 1024L, 8L * 1024L * 1024L * 1024L,
-                90000L, 2500000L, 500000L, 850, 4, 12, true, true, true, "NVIDIA GeForce RTX 4070", "42%"
+                90000L, 2500000L, 500000L, 850, 4, 12, 3, true, true, true, "NVIDIA GeForce RTX 4070", "42%"
         );
         if (stats.getTps() != 19.8f || stats.getMspt() != 15.2f) {
             throw new AssertionError("TPS/MSPT mismatch");
@@ -293,15 +293,15 @@ public class RpgTabUnitTests {
         // Test with 0 swap usage: should NOT display swap
         com.rpgtab.server.ServerHardwareStats noSwapStats = new com.rpgtab.server.ServerHardwareStats(
                 20.0f, 10.0f, 50.0, 600, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
-                0L, 8L * 1024L * 1024L * 1024L, 1000L, 100L, 100L, 100, 0, 0, false, false, false, "", ""
+                0L, 8L * 1024L * 1024L * 1024L, 1000L, 100L, 100L, 100, 0, 0, 0, false, false, false, "", ""
         );
         if (!"4.0 Go/16.0 Go".equals(noSwapStats.getFormattedMemory())) {
             throw new AssertionError("Zero swap should not be displayed: " + noSwapStats.getFormattedMemory());
         }
-        if (stats.getTotalLoadedChunks() != 850 || stats.getTotalGeneratingChunks() != 4 || stats.getDhGeneratingChunks() != 12) {
+        if (stats.getTotalLoadedChunks() != 850 || stats.getTotalGeneratingChunks() != 4 || stats.getDhGeneratingChunks() != 12 || stats.getSeedGenGeneratingChunks() != 3) {
             throw new AssertionError("Server chunk stats mismatch");
         }
-        if (!"850 loaded (Gen: 4 + DH:12)".equals(stats.getFormattedChunks())) {
+        if (!"850 loaded (Gen: 4 + DH:12 + SG:3)".equals(stats.getFormattedChunks())) {
             throw new AssertionError("Formatted chunks mismatch: " + stats.getFormattedChunks());
         }
         if (!"42%".equals(stats.getGpuStats())) {

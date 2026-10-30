@@ -19,6 +19,7 @@ public class ServerHardwareStats implements Serializable {
     private final int totalLoadedChunks;
     private final int totalGeneratingChunks;
     private final int dhGeneratingChunks;
+    private final int seedGenGeneratingChunks;
     private final boolean c2meOpenclLoaded;
     private final boolean dhLoaded;
     private final boolean seedGenLoaded;
@@ -29,6 +30,7 @@ public class ServerHardwareStats implements Serializable {
                                long usedRamBytes, long maxRamBytes, long usedSwapBytes, long maxSwapBytes,
                                long uptimeSeconds, long networkRxBytes, long networkTxBytes,
                                int totalLoadedChunks, int totalGeneratingChunks, int dhGeneratingChunks,
+                               int seedGenGeneratingChunks,
                                boolean c2meOpenclLoaded, boolean dhLoaded, boolean seedGenLoaded,
                                String gpuName, String gpuStats) {
         this.tps = tps;
@@ -45,6 +47,7 @@ public class ServerHardwareStats implements Serializable {
         this.totalLoadedChunks = Math.max(0, totalLoadedChunks);
         this.totalGeneratingChunks = Math.max(0, totalGeneratingChunks);
         this.dhGeneratingChunks = Math.max(0, dhGeneratingChunks);
+        this.seedGenGeneratingChunks = Math.max(0, seedGenGeneratingChunks);
         this.c2meOpenclLoaded = c2meOpenclLoaded;
         this.dhLoaded = dhLoaded;
         this.seedGenLoaded = seedGenLoaded;
@@ -108,6 +111,10 @@ public class ServerHardwareStats implements Serializable {
         return dhGeneratingChunks;
     }
 
+    public int getSeedGenGeneratingChunks() {
+        return seedGenGeneratingChunks;
+    }
+
     public boolean isC2meOpenclLoaded() {
         return c2meOpenclLoaded;
     }
@@ -134,7 +141,6 @@ public class ServerHardwareStats implements Serializable {
 
     public String getFormattedMemory() {
         String ramStr = formatMemory(usedRamBytes) + "/" + formatMemory(maxRamBytes);
-        // Only display Swap if swap is actually being used (usedSwapBytes > 0)
         if (usedSwapBytes > 0) {
             String swapStr = formatMemory(usedSwapBytes);
             if (maxSwapBytes > 0) {
@@ -146,13 +152,19 @@ public class ServerHardwareStats implements Serializable {
     }
 
     public String getFormattedChunks() {
-        if (dhGeneratingChunks > 0) {
-            return totalLoadedChunks + " loaded (Gen: " + totalGeneratingChunks + " + DH:" + dhGeneratingChunks + ")";
-        } else if (totalGeneratingChunks > 0) {
-            return totalLoadedChunks + " loaded (Gen: " + totalGeneratingChunks + ")";
-        } else {
-            return totalLoadedChunks + " loaded";
+        StringBuilder sb = new StringBuilder();
+        sb.append(totalLoadedChunks).append(" loaded");
+        if (totalGeneratingChunks > 0 || dhGeneratingChunks > 0 || seedGenGeneratingChunks > 0) {
+            sb.append(" (Gen: ").append(totalGeneratingChunks);
+            if (dhGeneratingChunks > 0) {
+                sb.append(" + DH:").append(dhGeneratingChunks);
+            }
+            if (seedGenGeneratingChunks > 0) {
+                sb.append(" + SG:").append(seedGenGeneratingChunks);
+            }
+            sb.append(")");
         }
+        return sb.toString();
     }
 
     public String getFormattedUptime() {
@@ -202,6 +214,7 @@ public class ServerHardwareStats implements Serializable {
         buf.writeVarInt(totalLoadedChunks);
         buf.writeVarInt(totalGeneratingChunks);
         buf.writeVarInt(dhGeneratingChunks);
+        buf.writeVarInt(seedGenGeneratingChunks);
         buf.writeBoolean(c2meOpenclLoaded);
         buf.writeBoolean(dhLoaded);
         buf.writeBoolean(seedGenLoaded);
@@ -224,12 +237,13 @@ public class ServerHardwareStats implements Serializable {
         int loadedChunks = buf.readVarInt();
         int genChunks = buf.readVarInt();
         int dhGenChunks = buf.readVarInt();
+        int sgGenChunks = buf.readVarInt();
         boolean c2me = buf.readBoolean();
         boolean dh = buf.readBoolean();
         boolean seedGen = buf.readBoolean();
         String gpu = buf.readUtf();
         String stats = buf.readUtf();
         return new ServerHardwareStats(tps, mspt, cpu, maxCpu, usedRam, maxRam, usedSwap, maxSwap, uptime, rx, tx,
-                loadedChunks, genChunks, dhGenChunks, c2me, dh, seedGen, gpu, stats);
+                loadedChunks, genChunks, dhGenChunks, sgGenChunks, c2me, dh, seedGen, gpu, stats);
     }
 }

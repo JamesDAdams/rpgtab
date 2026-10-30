@@ -293,11 +293,19 @@ public class RpgTabRenderer {
         }
         if (cfg.showServerDh && stats.isDhLoaded()) {
             if (line2Sb.length() > 0) line2Sb.append(" §8| ");
-            line2Sb.append("§b🌌 DH: §aActif");
+            if (stats.getDhGeneratingChunks() > 0) {
+                line2Sb.append("§b🌌 DH: §a").append(stats.getDhGeneratingChunks()).append(" gen");
+            } else {
+                line2Sb.append("§b🌌 DH: §aActif");
+            }
         }
         if (cfg.showServerSeedGen && stats.isSeedGenLoaded()) {
             if (line2Sb.length() > 0) line2Sb.append(" §8| ");
-            line2Sb.append("§e🌱 SeedGen: §aActif");
+            if (stats.getSeedGenGeneratingChunks() > 0) {
+                line2Sb.append("§e🌱 SeedGen: §a").append(stats.getSeedGenGeneratingChunks()).append(" gen");
+            } else {
+                line2Sb.append("§e🌱 SeedGen: §aActif");
+            }
         }
 
         String line2 = line2Sb.toString();
