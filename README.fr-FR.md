@@ -2,6 +2,8 @@
 
 Un remplacement soigné et hautement personnalisable de la liste des joueurs (menu TAB) façon RPG pour Minecraft NeoForge 1.21.1.
 
+![Aperçu du RPG Tab Overlay](preview.png)
+
 #### (Choisissez votre langue ci-dessous / Choose your language below)
 [![English](https://img.shields.io/badge/Language-English-blue)](README.md)
 [![Français](https://img.shields.io/badge/Language-Français-green)](README.fr-FR.md)
