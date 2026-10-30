@@ -437,8 +437,8 @@ public class ServerHardwareCollector {
         } catch (Throwable ignored) {}
 
         updateNetworkSpeeds();
-        long dlSpeed = curDlSpeed;
-        long ulSpeed = curUlSpeed;
+        long rxBytes = prevRxBytes > 0 ? prevRxBytes : 0L;
+        long txBytes = prevTxBytes > 0 ? prevTxBytes : 0L;
 
         // Pelican API override if configured
         try {
@@ -457,11 +457,8 @@ public class ServerHardwareCollector {
                     usedSwap = pStats.swapBytes();
                     maxSwap = pStats.swapLimitBytes();
                 }
-                // Use Pelican network speed if positive, otherwise keep container probe
-                if (pStats.networkRxSpeed() > 0 || pStats.networkTxSpeed() > 0 || (dlSpeed == 0 && ulSpeed == 0)) {
-                    dlSpeed = pStats.networkRxSpeed();
-                    ulSpeed = pStats.networkTxSpeed();
-                }
+                rxBytes = pStats.networkRxBytes();
+                txBytes = pStats.networkTxBytes();
             }
         } catch (Throwable ignored) {}
 
@@ -476,7 +473,7 @@ public class ServerHardwareCollector {
         String gpuStats = getGpuStats(server);
 
         return new ServerHardwareStats(tps, mspt, cpu, maxCpuPercent, usedRam, maxRam, usedSwap, maxSwap, uptimeSec,
-                dlSpeed, ulSpeed, totalLoadedChunks, totalGeneratingChunks, dhGeneratingChunks,
+                rxBytes, txBytes, totalLoadedChunks, totalGeneratingChunks, dhGeneratingChunks,
                 c2me, dh, seedGen, gpu, gpuStats);
     }
 }

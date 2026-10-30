@@ -28,16 +28,16 @@ public class RpgTabRenderer {
     private static final int PADDING_X = 14;
 
     private static final int COL_AVATAR = 22;
-    private static final int COL_NAME = 95;
-    private static final int COL_DIM = 60;
-    private static final int COL_HEALTH = 90;
-    private static final int COL_FOOD = 50;
-    private static final int COL_XP = 48;
+    private static final int COL_NAME = 105;
+    private static final int COL_DIM = 65;
+    private static final int COL_HEALTH = 100;
+    private static final int COL_FOOD = 55;
+    private static final int COL_XP = 52;
     private static final int COL_DEATHS = 52;
-    private static final int COL_QUESTS = 48;
-    private static final int COL_ADV = 45;
-    private static final int COL_PLAYTIME = 52;
-    private static final int COL_PING = 42;
+    private static final int COL_QUESTS = 52;
+    private static final int COL_ADV = 52;
+    private static final int COL_PLAYTIME = 58;
+    private static final int COL_PING = 46;
 
     public static void render(GuiGraphics graphics) {
         Minecraft mc = Minecraft.getInstance();
@@ -269,8 +269,8 @@ public class RpgTabRenderer {
         }
         if (cfg.showServerNetwork) {
             parts.add(String.format("§d🌐 Net: §f↓ %s ↑ %s",
-                    com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getDownloadBytesPerSec()),
-                    com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getUploadBytesPerSec())));
+                    com.rpgtab.server.ServerHardwareStats.formatBytes(stats.getNetworkRxBytes()),
+                    com.rpgtab.server.ServerHardwareStats.formatBytes(stats.getNetworkTxBytes())));
         }
         if (cfg.showServerUptime) {
             parts.add("§6⏱ Up: §f" + stats.getFormattedUptime());
@@ -367,7 +367,7 @@ public class RpgTabRenderer {
         if (cfg.showHealth) {
             float hp = isOnline ? entry.getHealth() : 0.0f;
             float maxHp = Math.max(1.0f, entry.getMaxHealth());
-            int barW = 70;
+            int barW = 75;
             int barH = 12;
             int barX = currX + 4;
             int barY = y + 6;

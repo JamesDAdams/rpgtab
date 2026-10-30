@@ -14,8 +14,8 @@ public class ServerHardwareStats implements Serializable {
     private final long usedSwapBytes;
     private final long maxSwapBytes;
     private final long uptimeSeconds;
-    private final long downloadBytesPerSec;
-    private final long uploadBytesPerSec;
+    private final long networkRxBytes;
+    private final long networkTxBytes;
     private final int totalLoadedChunks;
     private final int totalGeneratingChunks;
     private final int dhGeneratingChunks;
@@ -27,7 +27,7 @@ public class ServerHardwareStats implements Serializable {
 
     public ServerHardwareStats(float tps, float mspt, double cpuUsage, int maxCpuPercent,
                                long usedRamBytes, long maxRamBytes, long usedSwapBytes, long maxSwapBytes,
-                               long uptimeSeconds, long downloadBytesPerSec, long uploadBytesPerSec,
+                               long uptimeSeconds, long networkRxBytes, long networkTxBytes,
                                int totalLoadedChunks, int totalGeneratingChunks, int dhGeneratingChunks,
                                boolean c2meOpenclLoaded, boolean dhLoaded, boolean seedGenLoaded,
                                String gpuName, String gpuStats) {
@@ -40,8 +40,8 @@ public class ServerHardwareStats implements Serializable {
         this.usedSwapBytes = Math.max(0, usedSwapBytes);
         this.maxSwapBytes = Math.max(0, maxSwapBytes);
         this.uptimeSeconds = uptimeSeconds;
-        this.downloadBytesPerSec = downloadBytesPerSec;
-        this.uploadBytesPerSec = uploadBytesPerSec;
+        this.networkRxBytes = Math.max(0L, networkRxBytes);
+        this.networkTxBytes = Math.max(0L, networkTxBytes);
         this.totalLoadedChunks = Math.max(0, totalLoadedChunks);
         this.totalGeneratingChunks = Math.max(0, totalGeneratingChunks);
         this.dhGeneratingChunks = Math.max(0, dhGeneratingChunks);
@@ -88,12 +88,12 @@ public class ServerHardwareStats implements Serializable {
         return uptimeSeconds;
     }
 
-    public long getDownloadBytesPerSec() {
-        return downloadBytesPerSec;
+    public long getNetworkRxBytes() {
+        return networkRxBytes;
     }
 
-    public long getUploadBytesPerSec() {
-        return uploadBytesPerSec;
+    public long getNetworkTxBytes() {
+        return networkTxBytes;
     }
 
     public int getTotalLoadedChunks() {
@@ -169,15 +169,15 @@ public class ServerHardwareStats implements Serializable {
         }
     }
 
-    public static String formatSpeed(long bytesPerSec) {
-        if (bytesPerSec >= 1024L * 1024L * 1024L) {
-            return String.format("%.1f Go/s", bytesPerSec / (1024.0 * 1024.0 * 1024.0));
-        } else if (bytesPerSec >= 1024L * 1024L) {
-            return String.format("%.1f Mo/s", bytesPerSec / (1024.0 * 1024.0));
-        } else if (bytesPerSec >= 1024L) {
-            return String.format("%.0f Ko/s", bytesPerSec / 1024.0);
+    public static String formatBytes(long bytes) {
+        if (bytes >= 1024L * 1024L * 1024L) {
+            return String.format("%.1f GiB", bytes / (1024.0 * 1024.0 * 1024.0));
+        } else if (bytes >= 1024L * 1024L) {
+            return String.format("%.1f MiB", bytes / (1024.0 * 1024.0));
+        } else if (bytes >= 1024L) {
+            return String.format("%.0f KiB", bytes / 1024.0);
         } else {
-            return bytesPerSec + " o/s";
+            return bytes + " B";
         }
     }
 
@@ -196,8 +196,8 @@ public class ServerHardwareStats implements Serializable {
         buf.writeLong(usedSwapBytes);
         buf.writeLong(maxSwapBytes);
         buf.writeLong(uptimeSeconds);
-        buf.writeLong(downloadBytesPerSec);
-        buf.writeLong(uploadBytesPerSec);
+        buf.writeLong(networkRxBytes);
+        buf.writeLong(networkTxBytes);
         buf.writeVarInt(totalLoadedChunks);
         buf.writeVarInt(totalGeneratingChunks);
         buf.writeVarInt(dhGeneratingChunks);
@@ -218,8 +218,8 @@ public class ServerHardwareStats implements Serializable {
         long usedSwap = buf.readLong();
         long maxSwap = buf.readLong();
         long uptime = buf.readLong();
-        long dl = buf.readLong();
-        long ul = buf.readLong();
+        long rx = buf.readLong();
+        long tx = buf.readLong();
         int loadedChunks = buf.readVarInt();
         int genChunks = buf.readVarInt();
         int dhGenChunks = buf.readVarInt();
@@ -228,7 +228,7 @@ public class ServerHardwareStats implements Serializable {
         boolean seedGen = buf.readBoolean();
         String gpu = buf.readUtf();
         String stats = buf.readUtf();
-        return new ServerHardwareStats(tps, mspt, cpu, maxCpu, usedRam, maxRam, usedSwap, maxSwap, uptime, dl, ul,
+        return new ServerHardwareStats(tps, mspt, cpu, maxCpu, usedRam, maxRam, usedSwap, maxSwap, uptime, rx, tx,
                 loadedChunks, genChunks, dhGenChunks, c2me, dh, seedGen, gpu, stats);
     }
 }

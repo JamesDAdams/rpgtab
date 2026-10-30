@@ -4,7 +4,7 @@ license="MIT"
 
 [[mods]]
 modId="rpgtab"
-version="1.26.0"
+version="1.27.0"
 displayName="RPG Tab Overlay"
 description='RPG-styled TAB menu displaying player health, food, XP, deaths, ping, FTB quests and advancements.'
 authors="Antigravity"

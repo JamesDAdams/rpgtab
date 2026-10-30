@@ -310,9 +310,6 @@ public class RpgTabUnitTests {
         if (!stats.isC2meOpenclLoaded()) {
             throw new AssertionError("C2ME OpenCL flag mismatch");
         }
-        if (!"2.4 Mo/s".equals(com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getDownloadBytesPerSec()))) {
-            throw new AssertionError("Speed format mismatch: " + com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getDownloadBytesPerSec()));
-        }
         if (!"4.0 Go".equals(com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()))) {
             throw new AssertionError("RAM format mismatch: " + com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()));
         }
@@ -323,6 +320,12 @@ public class RpgTabUnitTests {
             throw new AssertionError("Failed to store ServerHardwareStats in ClientStatsCache");
         }
 
+        if (stats.getNetworkRxBytes() != 2500000L || stats.getNetworkTxBytes() != 500000L) {
+            throw new AssertionError("Network bytes mismatch");
+        }
+        if (!"2.4 MiB".equals(com.rpgtab.server.ServerHardwareStats.formatBytes(stats.getNetworkRxBytes()))) {
+            throw new AssertionError("Format bytes mismatch: " + com.rpgtab.server.ServerHardwareStats.formatBytes(stats.getNetworkRxBytes()));
+        }
         System.out.println("[PASS] ServerHardwareStats tests");
     }
 
