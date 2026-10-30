@@ -21,13 +21,14 @@ public class ServerHardwareStats implements Serializable {
     private final boolean dhLoaded;
     private final boolean seedGenLoaded;
     private final String gpuName;
+    private final String gpuStats;
 
     public ServerHardwareStats(float tps, float mspt, double cpuUsage, int maxCpuPercent,
                                long usedRamBytes, long maxRamBytes, long uptimeSeconds,
                                long downloadBytesPerSec, long uploadBytesPerSec,
                                int totalLoadedChunks, int totalGeneratingChunks, int dhGeneratingChunks,
                                boolean c2meOpenclLoaded, boolean dhLoaded, boolean seedGenLoaded,
-                               String gpuName) {
+                               String gpuName, String gpuStats) {
         this.tps = tps;
         this.mspt = mspt;
         this.cpuUsage = cpuUsage;
@@ -44,6 +45,7 @@ public class ServerHardwareStats implements Serializable {
         this.dhLoaded = dhLoaded;
         this.seedGenLoaded = seedGenLoaded;
         this.gpuName = gpuName != null ? gpuName : "";
+        this.gpuStats = gpuStats != null ? gpuStats : "";
     }
 
     public float getTps() {
@@ -110,8 +112,12 @@ public class ServerHardwareStats implements Serializable {
         return gpuName;
     }
 
+    public String getGpuStats() {
+        return gpuStats;
+    }
+
     public String getFormattedCpu() {
-        return String.format("%.0f%%/%d%%", cpuUsage, maxCpuPercent);
+        return String.format("%.0f%% / %d%%", cpuUsage, maxCpuPercent);
     }
 
     public String getFormattedChunks() {
@@ -173,6 +179,7 @@ public class ServerHardwareStats implements Serializable {
         buf.writeBoolean(dhLoaded);
         buf.writeBoolean(seedGenLoaded);
         buf.writeUtf(gpuName);
+        buf.writeUtf(gpuStats);
     }
 
     public static ServerHardwareStats read(RegistryFriendlyByteBuf buf) {
@@ -192,7 +199,8 @@ public class ServerHardwareStats implements Serializable {
         boolean dh = buf.readBoolean();
         boolean seedGen = buf.readBoolean();
         String gpu = buf.readUtf();
+        String stats = buf.readUtf();
         return new ServerHardwareStats(tps, mspt, cpu, maxCpu, usedRam, maxRam, uptime, dl, ul,
-                loadedChunks, genChunks, dhGenChunks, c2me, dh, seedGen, gpu);
+                loadedChunks, genChunks, dhGenChunks, c2me, dh, seedGen, gpu, stats);
     }
 }

@@ -173,8 +173,53 @@ public class ServerHardwareCollector {
         return cachedGpuName;
     }
 
+    public static String getGpuStats(MinecraftServer server) {
+        // 1. Try reading C2ME OpenCL context device queue & VRAM via reflection
+        if (server != null && isC2meOpenclLoaded()) {
+            try {
+                Class<?> extClass = Class.forName("com.ishland.c2me.opts.accel.opencl.common.ducks.MinecraftServerExtension");
+                if (extClass.isInstance(server)) {
+                    Object clCtx = extClass.getMethod("c2me$getCLContext").invoke(server);
+                    if (clCtx != null) {
+                        List<?> devices = (List<?>) clCtx.getClass().getMethod("getOpenDevices").invoke(clCtx);
+                        if (devices != null && !devices.isEmpty()) {
+                            Object dev = devices.get(0);
+                            int permits = (int) dev.getClass().getMethod("getPermits").invoke(dev);
+                            Object metadata = dev.getClass().getMethod("getMetadata").invoke(dev);
+                            long devPtr = metadata.getClass().getField("devicePtr").getLong(metadata);
+                            Class<?> utilClass = Class.forName("com.ishland.c2me.opts.accel.opencl.common.util.CLUtil");
+                            long globalMem = (long) utilClass.getMethod("getDeviceInfoLong", long.class, int.class).invoke(null, devPtr, 0x101F);
+                            if (globalMem > 0) {
+                                return String.format("VRAM: %.1f Go | Queue: %d", globalMem / (1024.0 * 1024.0 * 1024.0), permits);
+                            } else {
+                                return "Queue: " + permits;
+                            }
+                        }
+                    }
+                }
+            } catch (Throwable ignored) {}
+        }
+
+        // 2. Try OSHI VRAM
+        if (initOshi()) {
+            try {
+                Object hardware = oshiSystemInfo.getClass().getMethod("getHardware").invoke(oshiSystemInfo);
+                List<?> gpus = (List<?>) hardware.getClass().getMethod("getGraphicsCards").invoke(hardware);
+                if (gpus != null && !gpus.isEmpty()) {
+                    for (Object gpuObj : gpus) {
+                        long vram = (long) gpuObj.getClass().getMethod("getVRam").invoke(gpuObj);
+                        if (vram > 0) {
+                            return String.format("VRAM: %.1f Go", vram / (1024.0 * 1024.0 * 1024.0));
+                        }
+                    }
+                }
+            } catch (Throwable ignored) {}
+        }
+
+        return "";
+    }
+
     public static int getContainerAllocatedCores() {
-        // Read cgroup v2 cpu.max: "quota period"
         try {
             File v2Max = new File("/sys/fs/cgroup/cpu.max");
             if (v2Max.exists()) {
@@ -190,7 +235,6 @@ public class ServerHardwareCollector {
             }
         } catch (Throwable ignored) {}
 
-        // Read cgroup v1: cpu.cfs_quota_us and cpu.cfs_period_us
         try {
             File quotaFile = new File("/sys/fs/cgroup/cpu/cpu.cfs_quota_us");
             File periodFile = new File("/sys/fs/cgroup/cpu/cpu.cfs_period_us");
@@ -232,7 +276,6 @@ public class ServerHardwareCollector {
     }
 
     public static long[] getContainerMemory() {
-        // 1. Try cgroup v2
         try {
             File curFile = new File("/sys/fs/cgroup/memory.current");
             File maxFile = new File("/sys/fs/cgroup/memory.max");
@@ -252,7 +295,6 @@ public class ServerHardwareCollector {
             }
         } catch (Throwable ignored) {}
 
-        // 2. Try cgroup v1
         try {
             File curFile = new File("/sys/fs/cgroup/memory/memory.usage_in_bytes");
             File maxFile = new File("/sys/fs/cgroup/memory/memory.limit_in_bytes");
@@ -281,7 +323,6 @@ public class ServerHardwareCollector {
     public static void updateNetworkSpeeds() {
         long now = System.currentTimeMillis();
 
-        // 1. Try reading Linux /proc/net/dev
         try {
             File netDev = new File("/proc/net/dev");
             if (netDev.exists()) {
@@ -319,7 +360,6 @@ public class ServerHardwareCollector {
             }
         } catch (Throwable ignored) {}
 
-        // 2. Fallback to OSHI
         if (initOshi()) {
             try {
                 Object hardware = oshiSystemInfo.getClass().getMethod("getHardware").invoke(oshiSystemInfo);
@@ -385,9 +425,10 @@ public class ServerHardwareCollector {
         boolean dh = isDhLoaded();
         boolean seedGen = isSeedGenLoaded();
         String gpu = getGpuName();
+        String gpuStats = getGpuStats(server);
 
         return new ServerHardwareStats(tps, mspt, cpu, maxCpuPercent, usedRam, maxRam, uptimeSec,
                 curDlSpeed, curUlSpeed, totalLoadedChunks, totalGeneratingChunks, dhGeneratingChunks,
-                c2me, dh, seedGen, gpu);
+                c2me, dh, seedGen, gpu, gpuStats);
     }
 }

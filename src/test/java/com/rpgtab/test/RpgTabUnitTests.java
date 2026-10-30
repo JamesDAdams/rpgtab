@@ -274,7 +274,7 @@ public class RpgTabUnitTests {
     private static void testServerHardwareStats() {
         com.rpgtab.server.ServerHardwareStats stats = new com.rpgtab.server.ServerHardwareStats(
                 19.8f, 15.2f, 210.0, 600, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
-                90000L, 2500000L, 500000L, 850, 4, 12, true, true, true, "NVIDIA GeForce RTX 4070"
+                90000L, 2500000L, 500000L, 850, 4, 12, true, true, true, "NVIDIA GeForce RTX 4070", "VRAM: 12.0 Go"
         );
         if (stats.getTps() != 19.8f || stats.getMspt() != 15.2f) {
             throw new AssertionError("TPS/MSPT mismatch");
@@ -282,7 +282,7 @@ public class RpgTabUnitTests {
         if (stats.getCpuUsage() != 210.0 || stats.getMaxCpuPercent() != 600) {
             throw new AssertionError("CPU mismatch");
         }
-        if (!"210%/600%".equals(stats.getFormattedCpu())) {
+        if (!"210% / 600%".equals(stats.getFormattedCpu())) {
             throw new AssertionError("CPU format mismatch: " + stats.getFormattedCpu());
         }
         if (stats.getTotalLoadedChunks() != 850 || stats.getTotalGeneratingChunks() != 4 || stats.getDhGeneratingChunks() != 12) {
@@ -290,6 +290,9 @@ public class RpgTabUnitTests {
         }
         if (!"850 loaded (Gen: 4 + DH:12)".equals(stats.getFormattedChunks())) {
             throw new AssertionError("Formatted chunks mismatch: " + stats.getFormattedChunks());
+        }
+        if (!"VRAM: 12.0 Go".equals(stats.getGpuStats())) {
+            throw new AssertionError("GpuStats mismatch: " + stats.getGpuStats());
         }
         if (!stats.isDhLoaded() || !stats.isSeedGenLoaded()) {
             throw new AssertionError("DH / SeedGen loaded flags mismatch");
