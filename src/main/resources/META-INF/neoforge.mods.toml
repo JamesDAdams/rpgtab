@@ -1,0 +1,24 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="rpgtab"
+version="1.6.0"
+displayName="RPG Tab Overlay"
+description='RPG-styled TAB menu displaying player health, food, XP, deaths, ping, FTB quests and advancements.'
+authors="Antigravity"
+
+[[dependencies.rpgtab]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.0,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.rpgtab]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,)"
+ordering="NONE"
+side="BOTH"
