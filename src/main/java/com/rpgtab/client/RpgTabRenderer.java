@@ -28,15 +28,15 @@ public class RpgTabRenderer {
     private static final int PADDING_X = 14;
 
     private static final int COL_AVATAR = 22;
-    private static final int COL_NAME = 100;
-    private static final int COL_DIM = 65;
-    private static final int COL_HEALTH = 95;
-    private static final int COL_FOOD = 55;
-    private static final int COL_XP = 50;
-    private static final int COL_DEATHS = 45;
+    private static final int COL_NAME = 95;
+    private static final int COL_DIM = 60;
+    private static final int COL_HEALTH = 90;
+    private static final int COL_FOOD = 50;
+    private static final int COL_XP = 48;
+    private static final int COL_DEATHS = 52;
     private static final int COL_QUESTS = 48;
-    private static final int COL_ADV = 48;
-    private static final int COL_PLAYTIME = 55;
+    private static final int COL_ADV = 45;
+    private static final int COL_PLAYTIME = 52;
     private static final int COL_PING = 42;
 
     public static void render(GuiGraphics graphics) {
@@ -198,7 +198,7 @@ public class RpgTabRenderer {
             currentX += COL_XP;
         }
         if (cfg.showDeaths) {
-            graphics.drawString(font, "\u2620 Deaths", currentX + 2, colY, cfg.deathsColor, false);
+            graphics.drawString(font, "\u2620 Dead", currentX + 2, colY, cfg.deathsColor, false);
             currentX += COL_DEATHS;
         }
         if (cfg.showFtbQuests) {
@@ -412,21 +412,21 @@ public class RpgTabRenderer {
 
         // 6. Morts
         if (cfg.showDeaths) {
-            graphics.drawString(font, String.valueOf(entry.getDeaths()), currX + 6, textY, cfg.deathsColor, false);
+            graphics.drawString(font, String.valueOf(entry.getDeaths()), currX + 4, textY, cfg.deathsColor, false);
             currX += COL_DEATHS;
         }
 
         // 7. Quêtes FTB
         if (cfg.showFtbQuests) {
             String ftbStr = String.valueOf(entry.getFtbQuestsCount());
-            graphics.drawString(font, ftbStr, currX + 6, textY, isOnline ? cfg.ftbColor : 0xFFAAAAAA, false);
+            graphics.drawString(font, ftbStr, currX + 4, textY, isOnline ? cfg.ftbColor : 0xFFAAAAAA, false);
             currX += COL_QUESTS;
         }
 
         // 8. Avancements
         if (cfg.showAdvancements) {
             String advStr = String.valueOf(entry.getAdvancementsCount());
-            graphics.drawString(font, advStr, currX + 6, textY, isOnline ? cfg.advColor : 0xFFAAAAAA, false);
+            graphics.drawString(font, advStr, currX + 4, textY, isOnline ? cfg.advColor : 0xFFAAAAAA, false);
             currX += COL_ADV;
         }
 
