@@ -287,8 +287,8 @@ public class RpgTabRenderer {
             if (!gpuName.isEmpty() && !gpuName.equalsIgnoreCase("unknown")) {
                 line2Sb.append("§3⚡ GPU: §f").append(gpuName);
                 String gpuStats = stats.getGpuStats();
-                if (!gpuStats.isEmpty()) {
-                    line2Sb.append(" §7(").append(gpuStats).append(")");
+                if (!gpuStats.isEmpty() && !gpuStats.equalsIgnoreCase("unknown")) {
+                    line2Sb.append(" §b(").append(gpuStats).append(")");
                 }
             }
             if (stats.isC2meOpenclLoaded()) {

@@ -25,6 +25,11 @@ public class ServerHardwareCollector {
     private static Boolean cachedDhLoaded = null;
     private static Boolean cachedSeedGenLoaded = null;
 
+    // Intel iGPU RC6 (energy/power state) measuring
+    private static long prevGpuMeasureTimeMs = 0;
+    private static long prevGpuBusyTimeMs = -1;
+    private static File cachedGpuBusyFile = null;
+
     private static boolean initOshi() {
         if (oshiAvailable != null) {
             return oshiAvailable;
@@ -138,21 +143,18 @@ public class ServerHardwareCollector {
             return cachedGpuName;
         }
 
-        // 1. C2ME OpenCL direct device name
         String c2meGpu = getC2MEGpuName();
         if (!c2meGpu.isEmpty()) {
             cachedGpuName = c2meGpu;
             return cachedGpuName;
         }
 
-        // 2. Linux NVIDIA procfs
         String procGpu = getNvidiaProcfsGpuName();
         if (!procGpu.isEmpty()) {
             cachedGpuName = procGpu;
             return cachedGpuName;
         }
 
-        // 3. OSHI hardware graphics cards
         if (initOshi()) {
             try {
                 Object hardware = oshiSystemInfo.getClass().getMethod("getHardware").invoke(oshiSystemInfo);
@@ -174,46 +176,59 @@ public class ServerHardwareCollector {
     }
 
     public static String getGpuStats(MinecraftServer server) {
-        // 1. Try reading C2ME OpenCL context device queue & VRAM via reflection
-        if (server != null && isC2meOpenclLoaded()) {
-            try {
-                Class<?> extClass = Class.forName("com.ishland.c2me.opts.accel.opencl.common.ducks.MinecraftServerExtension");
-                if (extClass.isInstance(server)) {
-                    Object clCtx = extClass.getMethod("c2me$getCLContext").invoke(server);
-                    if (clCtx != null) {
-                        List<?> devices = (List<?>) clCtx.getClass().getMethod("getOpenDevices").invoke(clCtx);
-                        if (devices != null && !devices.isEmpty()) {
-                            Object dev = devices.get(0);
-                            int permits = (int) dev.getClass().getMethod("getPermits").invoke(dev);
-                            Object metadata = dev.getClass().getMethod("getMetadata").invoke(dev);
-                            long devPtr = metadata.getClass().getField("devicePtr").getLong(metadata);
-                            Class<?> utilClass = Class.forName("com.ishland.c2me.opts.accel.opencl.common.util.CLUtil");
-                            long globalMem = (long) utilClass.getMethod("getDeviceInfoLong", long.class, int.class).invoke(null, devPtr, 0x101F);
-                            if (globalMem > 0) {
-                                return String.format("VRAM: %.1f Go | Queue: %d", globalMem / (1024.0 * 1024.0 * 1024.0), permits);
-                            } else {
-                                return "Queue: " + permits;
-                            }
-                        }
-                    }
-                }
-            } catch (Throwable ignored) {}
-        }
+        long now = System.currentTimeMillis();
 
-        // 2. Try OSHI VRAM
-        if (initOshi()) {
-            try {
-                Object hardware = oshiSystemInfo.getClass().getMethod("getHardware").invoke(oshiSystemInfo);
-                List<?> gpus = (List<?>) hardware.getClass().getMethod("getGraphicsCards").invoke(hardware);
-                if (gpus != null && !gpus.isEmpty()) {
-                    for (Object gpuObj : gpus) {
-                        long vram = (long) gpuObj.getClass().getMethod("getVRam").invoke(gpuObj);
-                        if (vram > 0) {
-                            return String.format("VRAM: %.1f Go", vram / (1024.0 * 1024.0 * 1024.0));
-                        }
+        // 1. Try reading Linux Intel iGPU rc6 residency via sysfs (/sys/class/drm/card0/gt_act_freq_mhz or rc6_residency_ms)
+        try {
+            if (cachedGpuBusyFile == null) {
+                File[] candidates = new File[] {
+                    new File("/sys/class/drm/card0/gt/gt0/rc6_residency_ms"),
+                    new File("/sys/class/drm/card0/power/rc6_residency_ms"),
+                    new File("/sys/class/drm/card1/power/rc6_residency_ms")
+                };
+                for (File cand : candidates) {
+                    if (cand.exists()) {
+                        cachedGpuBusyFile = cand;
+                        break;
                     }
                 }
-            } catch (Throwable ignored) {}
+            }
+
+            if (cachedGpuBusyFile != null && cachedGpuBusyFile.exists()) {
+                long rc6Ms = Long.parseLong(Files.readString(cachedGpuBusyFile.toPath()).trim());
+                if (prevGpuMeasureTimeMs > 0 && now > prevGpuMeasureTimeMs && prevGpuBusyTimeMs >= 0) {
+                    long durationMs = now - prevGpuMeasureTimeMs;
+                    long idleMs = Math.max(0L, rc6Ms - prevGpuBusyTimeMs);
+                    long busyMs = Math.max(0L, durationMs - idleMs);
+                    double percent = Math.min(100.0, Math.max(0.0, (busyMs * 100.0) / durationMs));
+                    prevGpuMeasureTimeMs = now;
+                    prevGpuBusyTimeMs = rc6Ms;
+                    return String.format("%.0f%%", percent);
+                }
+                prevGpuMeasureTimeMs = now;
+                prevGpuBusyTimeMs = rc6Ms;
+            }
+        } catch (Throwable ignored) {}
+
+        // 2. Try reading Intel GPU frequency (act_freq / max_freq)
+        try {
+            File actFreqFile = new File("/sys/class/drm/card0/gt_act_freq_mhz");
+            File maxFreqFile = new File("/sys/class/drm/card0/gt_max_freq_mhz");
+            if (actFreqFile.exists() && maxFreqFile.exists()) {
+                double act = Double.parseDouble(Files.readString(actFreqFile.toPath()).trim());
+                double max = Double.parseDouble(Files.readString(maxFreqFile.toPath()).trim());
+                File minFreqFile = new File("/sys/class/drm/card0/gt_min_freq_mhz");
+                double min = minFreqFile.exists() ? Double.parseDouble(Files.readString(minFreqFile.toPath()).trim()) : 350.0;
+                if (max > min) {
+                    double load = Math.min(100.0, Math.max(0.0, ((act - min) / (max - min)) * 100.0));
+                    return String.format("%.0f%%", load);
+                }
+            }
+        } catch (Throwable ignored) {}
+
+        // 3. Fallback: C2ME OpenCL active status
+        if (isC2meOpenclLoaded()) {
+            return "Actif";
         }
 
         return "";
