@@ -11,7 +11,7 @@ import java.time.Duration;
 public class PelicanApiHelper {
 
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(3))
+            .connectTimeout(Duration.ofMillis(1200))
             .build();
 
     private static volatile PelicanStats cachedStats = null;
@@ -28,8 +28,8 @@ public class PelicanApiHelper {
         }
 
         long now = System.currentTimeMillis();
-        // Rafraîchir toutes les 2 secondes en arrière-plan sans bloquer la tick Minecraft
-        if (now - lastFetchTime > 2000 && !fetching) {
+        // Rafraîchir toutes les 1000 ms (1 seconde) en arrière-plan sans bloquer
+        if (now - lastFetchTime > 1000 && !fetching) {
             fetching = true;
             Thread.ofVirtual().start(() -> {
                 try {
@@ -44,7 +44,7 @@ public class PelicanApiHelper {
                             .header("Authorization", "Bearer " + apiKey.trim())
                             .header("Accept", "application/json")
                             .header("Content-Type", "application/json")
-                            .timeout(Duration.ofSeconds(3))
+                            .timeout(Duration.ofMillis(1200))
                             .GET()
                             .build();
 
@@ -67,12 +67,11 @@ public class PelicanApiHelper {
                             txSpeed = Math.max(0, (tx - cachedStats.networkTxBytes()) * 1000L / dur);
                         }
 
-                        // memory_limit_bytes if available in attrs
                         long memLimit = 0;
                         if (attrs.has("limits") && attrs.get("limits").isJsonObject()) {
                             JsonObject limits = attrs.getAsJsonObject("limits");
                             if (limits.has("memory")) {
-                                memLimit = limits.get("memory").getAsLong() * 1024L * 1024L; // MiB to bytes
+                                memLimit = limits.get("memory").getAsLong() * 1024L * 1024L;
                             }
                         }
 

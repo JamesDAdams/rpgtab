@@ -258,6 +258,12 @@ public class RpgTabRenderer {
         if (cfg.showServerCpu) {
             parts.add("§b🖥 CPU: §f" + stats.getFormattedCpu());
         }
+        if (cfg.showServerGpu) {
+            String gpuStats = stats.getGpuStats();
+            if (!gpuStats.isEmpty() && !gpuStats.equalsIgnoreCase("unknown")) {
+                parts.add("§3⚡ GPU: §f" + gpuStats);
+            }
+        }
         if (cfg.showServerRam) {
             parts.add(String.format("§a💾 RAM: §f%s/%s", com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()),
                     com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getMaxRamBytes())));
@@ -266,9 +272,6 @@ public class RpgTabRenderer {
             parts.add(String.format("§d🌐 Net: §f↓ %s ↑ %s",
                     com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getDownloadBytesPerSec()),
                     com.rpgtab.server.ServerHardwareStats.formatSpeed(stats.getUploadBytesPerSec())));
-        }
-        if (cfg.showServerChunks) {
-            parts.add("§2☵ " + stats.getFormattedChunks());
         }
         if (cfg.showServerUptime) {
             parts.add("§6⏱ Up: §f" + stats.getFormattedUptime());
@@ -280,17 +283,14 @@ public class RpgTabRenderer {
             graphics.drawString(font, line1, startX + (totalWidth - line1W) / 2, footerY + 4, 0xFFE0E0E0, false);
         }
 
-        // Ligne 2 : GPU, C2ME OpenCL, Distant Horizons & SeedGen
+        // Ligne 2 : Chunks serveur, C2ME OpenCL, Distant Horizons & SeedGen
         StringBuilder line2Sb = new StringBuilder();
-        if (cfg.showServerGpu) {
-            String gpuStats = stats.getGpuStats();
-            if (!gpuStats.isEmpty() && !gpuStats.equalsIgnoreCase("unknown")) {
-                line2Sb.append("§3⚡ GPU: §f").append(gpuStats);
-            }
-            if (stats.isC2meOpenclLoaded()) {
-                if (line2Sb.length() > 0) line2Sb.append(" §8| ");
-                line2Sb.append("§2✔ C2ME OpenCL: §aActif");
-            }
+        if (cfg.showServerChunks) {
+            line2Sb.append("§2☵ ").append(stats.getFormattedChunks());
+        }
+        if (cfg.showServerGpu && stats.isC2meOpenclLoaded()) {
+            if (line2Sb.length() > 0) line2Sb.append(" §8| ");
+            line2Sb.append("§2✔ C2ME OpenCL: §aActif");
         }
         if (cfg.showServerDh && stats.isDhLoaded()) {
             if (line2Sb.length() > 0) line2Sb.append(" §8| ");
