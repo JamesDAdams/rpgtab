@@ -11,6 +11,8 @@ public class ServerHardwareStats implements Serializable {
     private final int maxCpuPercent;
     private final long usedRamBytes;
     private final long maxRamBytes;
+    private final long usedSwapBytes;
+    private final long maxSwapBytes;
     private final long uptimeSeconds;
     private final long downloadBytesPerSec;
     private final long uploadBytesPerSec;
@@ -24,8 +26,8 @@ public class ServerHardwareStats implements Serializable {
     private final String gpuStats;
 
     public ServerHardwareStats(float tps, float mspt, double cpuUsage, int maxCpuPercent,
-                               long usedRamBytes, long maxRamBytes, long uptimeSeconds,
-                               long downloadBytesPerSec, long uploadBytesPerSec,
+                               long usedRamBytes, long maxRamBytes, long usedSwapBytes, long maxSwapBytes,
+                               long uptimeSeconds, long downloadBytesPerSec, long uploadBytesPerSec,
                                int totalLoadedChunks, int totalGeneratingChunks, int dhGeneratingChunks,
                                boolean c2meOpenclLoaded, boolean dhLoaded, boolean seedGenLoaded,
                                String gpuName, String gpuStats) {
@@ -35,6 +37,8 @@ public class ServerHardwareStats implements Serializable {
         this.maxCpuPercent = maxCpuPercent > 0 ? maxCpuPercent : 100;
         this.usedRamBytes = usedRamBytes;
         this.maxRamBytes = maxRamBytes;
+        this.usedSwapBytes = Math.max(0, usedSwapBytes);
+        this.maxSwapBytes = Math.max(0, maxSwapBytes);
         this.uptimeSeconds = uptimeSeconds;
         this.downloadBytesPerSec = downloadBytesPerSec;
         this.uploadBytesPerSec = uploadBytesPerSec;
@@ -70,6 +74,14 @@ public class ServerHardwareStats implements Serializable {
 
     public long getMaxRamBytes() {
         return maxRamBytes;
+    }
+
+    public long getUsedSwapBytes() {
+        return usedSwapBytes;
+    }
+
+    public long getMaxSwapBytes() {
+        return maxSwapBytes;
     }
 
     public long getUptimeSeconds() {
@@ -118,6 +130,18 @@ public class ServerHardwareStats implements Serializable {
 
     public String getFormattedCpu() {
         return String.format("%.0f%% / %d%%", cpuUsage, maxCpuPercent);
+    }
+
+    public String getFormattedMemory() {
+        String ramStr = formatMemory(usedRamBytes) + "/" + formatMemory(maxRamBytes);
+        if (maxSwapBytes > 0 || usedSwapBytes > 0) {
+            String swapStr = formatMemory(usedSwapBytes);
+            if (maxSwapBytes > 0) {
+                swapStr += "/" + formatMemory(maxSwapBytes);
+            }
+            return ramStr + " §8(Swap: " + swapStr + ")";
+        }
+        return ramStr;
     }
 
     public String getFormattedChunks() {
@@ -169,6 +193,8 @@ public class ServerHardwareStats implements Serializable {
         buf.writeVarInt(maxCpuPercent);
         buf.writeLong(usedRamBytes);
         buf.writeLong(maxRamBytes);
+        buf.writeLong(usedSwapBytes);
+        buf.writeLong(maxSwapBytes);
         buf.writeLong(uptimeSeconds);
         buf.writeLong(downloadBytesPerSec);
         buf.writeLong(uploadBytesPerSec);
@@ -189,6 +215,8 @@ public class ServerHardwareStats implements Serializable {
         int maxCpu = buf.readVarInt();
         long usedRam = buf.readLong();
         long maxRam = buf.readLong();
+        long usedSwap = buf.readLong();
+        long maxSwap = buf.readLong();
         long uptime = buf.readLong();
         long dl = buf.readLong();
         long ul = buf.readLong();
@@ -200,7 +228,7 @@ public class ServerHardwareStats implements Serializable {
         boolean seedGen = buf.readBoolean();
         String gpu = buf.readUtf();
         String stats = buf.readUtf();
-        return new ServerHardwareStats(tps, mspt, cpu, maxCpu, usedRam, maxRam, uptime, dl, ul,
+        return new ServerHardwareStats(tps, mspt, cpu, maxCpu, usedRam, maxRam, usedSwap, maxSwap, uptime, dl, ul,
                 loadedChunks, genChunks, dhGenChunks, c2me, dh, seedGen, gpu, stats);
     }
 }

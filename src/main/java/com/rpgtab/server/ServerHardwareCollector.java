@@ -424,6 +424,12 @@ public class ServerHardwareCollector {
         long[] mem = getContainerMemory();
         long usedRam = mem[0];
         long maxRam = mem[1];
+        long usedSwap = 0;
+        long maxSwap = 0;
+
+        long[] swap = PelicanApiHelper.getContainerSwapStats();
+        usedSwap = swap[0];
+        maxSwap = swap[1];
 
         long uptimeSec = 0;
         try {
@@ -447,6 +453,10 @@ public class ServerHardwareCollector {
                 if (pStats.memoryLimitBytes() > 0) {
                     maxRam = pStats.memoryLimitBytes();
                 }
+                if (pStats.swapLimitBytes() > 0 || pStats.swapBytes() > 0) {
+                    usedSwap = pStats.swapBytes();
+                    maxSwap = pStats.swapLimitBytes();
+                }
                 // Use Pelican network speed if positive, otherwise keep container probe
                 if (pStats.networkRxSpeed() > 0 || pStats.networkTxSpeed() > 0 || (dlSpeed == 0 && ulSpeed == 0)) {
                     dlSpeed = pStats.networkRxSpeed();
@@ -465,7 +475,7 @@ public class ServerHardwareCollector {
         String gpu = getGpuName();
         String gpuStats = getGpuStats(server);
 
-        return new ServerHardwareStats(tps, mspt, cpu, maxCpuPercent, usedRam, maxRam, uptimeSec,
+        return new ServerHardwareStats(tps, mspt, cpu, maxCpuPercent, usedRam, maxRam, usedSwap, maxSwap, uptimeSec,
                 dlSpeed, ulSpeed, totalLoadedChunks, totalGeneratingChunks, dhGeneratingChunks,
                 c2me, dh, seedGen, gpu, gpuStats);
     }

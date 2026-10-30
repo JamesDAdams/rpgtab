@@ -274,6 +274,7 @@ public class RpgTabUnitTests {
     private static void testServerHardwareStats() {
         com.rpgtab.server.ServerHardwareStats stats = new com.rpgtab.server.ServerHardwareStats(
                 19.8f, 15.2f, 210.0, 600, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
+                1L * 1024L * 1024L * 1024L, 8L * 1024L * 1024L * 1024L,
                 90000L, 2500000L, 500000L, 850, 4, 12, true, true, true, "NVIDIA GeForce RTX 4070", "42%"
         );
         if (stats.getTps() != 19.8f || stats.getMspt() != 15.2f) {
@@ -284,6 +285,9 @@ public class RpgTabUnitTests {
         }
         if (!"210% / 600%".equals(stats.getFormattedCpu())) {
             throw new AssertionError("CPU format mismatch: " + stats.getFormattedCpu());
+        }
+        if (!"4.0 Go/16.0 Go §8(Swap: 1.0 Go/8.0 Go)".equals(stats.getFormattedMemory())) {
+            throw new AssertionError("Memory format mismatch: " + stats.getFormattedMemory());
         }
         if (stats.getTotalLoadedChunks() != 850 || stats.getTotalGeneratingChunks() != 4 || stats.getDhGeneratingChunks() != 12) {
             throw new AssertionError("Server chunk stats mismatch");

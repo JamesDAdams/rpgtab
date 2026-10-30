@@ -2,10 +2,12 @@ package com.rpgtab.server;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.File;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.time.Duration;
 
 public class PelicanApiHelper {
@@ -24,8 +26,51 @@ public class PelicanApiHelper {
     private static volatile boolean fetching = false;
 
     public record PelicanStats(double cpuAbsolute, long memoryBytes, long memoryLimitBytes,
+                               long swapBytes, long swapLimitBytes,
                                long networkRxBytes, long networkTxBytes,
                                long networkRxSpeed, long networkTxSpeed, boolean isRunning) {}
+
+    public static long[] getContainerSwapStats() {
+        // [swapUsedBytes, swapLimitBytes]
+        // 1. Try cgroup v2: /sys/fs/cgroup/memory.swap.current and /sys/fs/cgroup/memory.swap.max
+        try {
+            File curFile = new File("/sys/fs/cgroup/memory.swap.current");
+            File maxFile = new File("/sys/fs/cgroup/memory.swap.max");
+            if (curFile.exists()) {
+                long used = Long.parseLong(Files.readString(curFile.toPath()).trim());
+                long max = 0;
+                if (maxFile.exists()) {
+                    String s = Files.readString(maxFile.toPath()).trim();
+                    if (!s.equals("max")) {
+                        max = Long.parseLong(s);
+                    }
+                }
+                return new long[]{used, max};
+            }
+        } catch (Throwable ignored) {}
+
+        // 2. Try cgroup v1: memory.memsw.usage_in_bytes - memory.usage_in_bytes
+        try {
+            File memswFile = new File("/sys/fs/cgroup/memory/memory.memsw.usage_in_bytes");
+            File memFile = new File("/sys/fs/cgroup/memory/memory.usage_in_bytes");
+            File memswLimitFile = new File("/sys/fs/cgroup/memory/memory.memsw.limit_in_bytes");
+            File memLimitFile = new File("/sys/fs/cgroup/memory/memory.limit_in_bytes");
+            if (memswFile.exists() && memFile.exists()) {
+                long memsw = Long.parseLong(Files.readString(memswFile.toPath()).trim());
+                long mem = Long.parseLong(Files.readString(memFile.toPath()).trim());
+                long usedSwap = Math.max(0L, memsw - mem);
+                long maxSwap = 0;
+                if (memswLimitFile.exists() && memLimitFile.exists()) {
+                    long memswLim = Long.parseLong(Files.readString(memswLimitFile.toPath()).trim());
+                    long memLim = Long.parseLong(Files.readString(memLimitFile.toPath()).trim());
+                    maxSwap = Math.max(0L, memswLim - memLim);
+                }
+                return new long[]{usedSwap, maxSwap};
+            }
+        } catch (Throwable ignored) {}
+
+        return new long[]{0L, 0L};
+    }
 
     public static PelicanStats getStats(String panelUrl, String apiKey, String serverId) {
         if (panelUrl == null || panelUrl.trim().isEmpty() || apiKey == null || apiKey.trim().isEmpty() || serverId == null || serverId.trim().isEmpty()) {
@@ -77,14 +122,24 @@ public class PelicanApiHelper {
                         prevApiTxBytes = tx;
 
                         long memLimit = 0;
+                        long swapLimit = 0;
                         if (attrs.has("limits") && attrs.get("limits").isJsonObject()) {
                             JsonObject limits = attrs.getAsJsonObject("limits");
                             if (limits.has("memory")) {
                                 memLimit = limits.get("memory").getAsLong() * 1024L * 1024L;
                             }
+                            if (limits.has("swap")) {
+                                swapLimit = limits.get("swap").getAsLong() * 1024L * 1024L;
+                            }
                         }
 
-                        cachedStats = new PelicanStats(cpu, mem, memLimit, rx, tx, computedRxSpeed, computedTxSpeed, true);
+                        long[] cgroupSwap = getContainerSwapStats();
+                        long usedSwap = cgroupSwap[0];
+                        if (swapLimit <= 0) {
+                            swapLimit = cgroupSwap[1];
+                        }
+
+                        cachedStats = new PelicanStats(cpu, mem, memLimit, usedSwap, swapLimit, rx, tx, computedRxSpeed, computedTxSpeed, true);
                     }
                 } catch (Throwable ignored) {
                 } finally {

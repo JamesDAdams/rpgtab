@@ -265,8 +265,7 @@ public class RpgTabRenderer {
             }
         }
         if (cfg.showServerRam) {
-            parts.add(String.format("§a💾 RAM: §f%s/%s", com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getUsedRamBytes()),
-                    com.rpgtab.server.ServerHardwareStats.formatMemory(stats.getMaxRamBytes())));
+            parts.add("§a💾 RAM: §f" + stats.getFormattedMemory());
         }
         if (cfg.showServerNetwork) {
             parts.add(String.format("§d🌐 Net: §f↓ %s ↑ %s",
