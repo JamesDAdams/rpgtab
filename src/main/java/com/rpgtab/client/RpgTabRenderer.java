@@ -283,13 +283,9 @@ public class RpgTabRenderer {
         // Ligne 2 : GPU, C2ME OpenCL, Distant Horizons & SeedGen
         StringBuilder line2Sb = new StringBuilder();
         if (cfg.showServerGpu) {
-            String gpuName = stats.getGpuName();
-            if (!gpuName.isEmpty() && !gpuName.equalsIgnoreCase("unknown")) {
-                line2Sb.append("§3⚡ GPU: §f").append(gpuName);
-                String gpuStats = stats.getGpuStats();
-                if (!gpuStats.isEmpty() && !gpuStats.equalsIgnoreCase("unknown")) {
-                    line2Sb.append(" §b(").append(gpuStats).append(")");
-                }
+            String gpuStats = stats.getGpuStats();
+            if (!gpuStats.isEmpty() && !gpuStats.equalsIgnoreCase("unknown")) {
+                line2Sb.append("§3⚡ GPU: §f").append(gpuStats);
             }
             if (stats.isC2meOpenclLoaded()) {
                 if (line2Sb.length() > 0) line2Sb.append(" §8| ");
