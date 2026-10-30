@@ -2,8 +2,8 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 Add-Type -AssemblyName System.IO.Compression
 
 $ErrorActionPreference = "Stop"
-$projectDir = (Get-Location).Path
-$rpgTabDir = Join-Path $projectDir "rpgtab"
+$rpgTabDir = $PSScriptRoot
+if (-not $rpgTabDir) { $rpgTabDir = (Get-Location).Path }
 $templateDir = "C:\Users\JamesAdams\AppData\Roaming\ModrinthApp\profiles\Template 1.21.1"
 $metaLibs = "$env:APPDATA\ModrinthApp\meta\libraries"
 $zuluJava = "$env:APPDATA\ModrinthApp\meta\java_versions\zulu21.52.203-ca-jre21.0.12.1-win_x64\bin\java.exe"
