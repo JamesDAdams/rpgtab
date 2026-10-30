@@ -1,5 +1,6 @@
 package com.rpgtab.config;
 
+import com.rpgtab.RpgTabConstants;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -41,9 +42,9 @@ public class RpgTabServerConfig {
     public RpgTabServerConfig(ModConfigSpec.Builder builder) {
         builder.push("general");
         title = builder.comment("Titre affiche au dessus du tableau RPG")
-                .define("title", "ADVENTURERS OF THE REALM");
+                .define("title", RpgTabConstants.DEFAULT_TITLE);
         titleColor = builder.comment("Couleur du titre en hex (ex: 0xFFE5A93C)")
-                .define("titleColor", "0xFFE5A93C");
+                .define("titleColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_TITLE_COLOR).toUpperCase());
         showOfflinePlayers = builder.comment("Afficher aussi les joueurs hors ligne ayant deja joue sur le serveur")
                 .define("showOfflinePlayers", true);
         builder.pop();
@@ -61,13 +62,13 @@ public class RpgTabServerConfig {
         builder.pop();
 
         builder.push("colors");
-        healthColor = builder.comment("Couleur texte PV (hex)").define("healthColor", "0xFFFF7777");
-        foodColor = builder.comment("Couleur texte Faim (hex)").define("foodColor", "0xFFFBBF24");
-        xpColor = builder.comment("Couleur texte XP (hex)").define("xpColor", "0xFF4ADE80");
-        deathsColor = builder.comment("Couleur texte Morts (hex)").define("deathsColor", "0xFFE2E8F0");
-        ftbColor = builder.comment("Couleur texte Quetes FTB (hex)").define("ftbColor", "0xFF38BDF8");
-        advColor = builder.comment("Couleur texte Progres (hex)").define("advColor", "0xFFFACC15");
-        playTimeColor = builder.comment("Couleur texte Temps de jeu (hex)").define("playTimeColor", "0xFFA78BFA");
+        healthColor = builder.comment("Couleur texte PV (hex)").define("healthColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_HEALTH_COLOR).toUpperCase());
+        foodColor = builder.comment("Couleur texte Faim (hex)").define("foodColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_FOOD_COLOR).toUpperCase());
+        xpColor = builder.comment("Couleur texte XP (hex)").define("xpColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_XP_COLOR).toUpperCase());
+        deathsColor = builder.comment("Couleur texte Morts (hex)").define("deathsColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_DEATHS_COLOR).toUpperCase());
+        ftbColor = builder.comment("Couleur texte Quetes FTB (hex)").define("ftbColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_FTB_COLOR).toUpperCase());
+        advColor = builder.comment("Couleur texte Progres (hex)").define("advColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_ADV_COLOR).toUpperCase());
+        playTimeColor = builder.comment("Couleur texte Temps de jeu (hex)").define("playTimeColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_PLAYTIME_COLOR).toUpperCase());
         builder.pop();
     }
 }

@@ -22,20 +22,20 @@ public class PlayerStatsEntry {
     public PlayerStatsEntry(UUID uuid, String name, String teamName, boolean online, float health, float maxHealth,
                             int foodLevel, float saturation, int xpLevel, float xpProgress,
                             int deaths, int advancementsCount, int ftbQuestsCount, long playTimeTicks) {
-        this.uuid = uuid;
-        this.name = name != null ? name : "Unknown";
+        this.uuid = uuid != null ? uuid : new UUID(0L, 0L);
+        this.name = name != null && !name.trim().isEmpty() ? name : "Unknown";
         this.teamName = teamName != null ? teamName : "";
         this.online = online;
-        this.health = health;
-        this.maxHealth = maxHealth;
-        this.foodLevel = foodLevel;
-        this.saturation = saturation;
-        this.xpLevel = xpLevel;
-        this.xpProgress = xpProgress;
-        this.deaths = deaths;
-        this.advancementsCount = advancementsCount;
-        this.ftbQuestsCount = ftbQuestsCount;
-        this.playTimeTicks = playTimeTicks;
+        this.health = Math.max(0.0f, health);
+        this.maxHealth = Math.max(1.0f, maxHealth);
+        this.foodLevel = Math.max(0, foodLevel);
+        this.saturation = Math.max(0.0f, saturation);
+        this.xpLevel = Math.max(0, xpLevel);
+        this.xpProgress = Math.max(0.0f, Math.min(1.0f, xpProgress));
+        this.deaths = Math.max(0, deaths);
+        this.advancementsCount = Math.max(0, advancementsCount);
+        this.ftbQuestsCount = Math.max(0, ftbQuestsCount);
+        this.playTimeTicks = Math.max(0L, playTimeTicks);
     }
 
     public UUID getUuid() {
@@ -95,10 +95,15 @@ public class PlayerStatsEntry {
     }
 
     public String getFormattedPlayTime() {
-        long totalSeconds = playTimeTicks / 20L;
-        long hours = totalSeconds / 3600L;
-        long minutes = (totalSeconds % 3600L) / 60L;
-        if (hours > 0) {
+        long totalSeconds = Math.max(0L, playTimeTicks) / 20L;
+        long days = totalSeconds / 86400L;
+        long remainingAfterDays = totalSeconds % 86400L;
+        long hours = remainingAfterDays / 3600L;
+        long minutes = (remainingAfterDays % 3600L) / 60L;
+
+        if (days > 0) {
+            return days + "d" + (hours > 0 ? " " + hours + "h" : "");
+        } else if (hours > 0) {
             return hours + "h" + (minutes > 0 ? " " + minutes + "m" : "");
         } else {
             return minutes + "m";

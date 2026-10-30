@@ -1,5 +1,6 @@
 package com.rpgtab.client;
 
+import com.rpgtab.RpgTabConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
@@ -10,7 +11,7 @@ import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
-@EventBusSubscriber(modid = "rpgtab", value = Dist.CLIENT)
+@EventBusSubscriber(modid = RpgTabConstants.MODID, value = Dist.CLIENT)
 public class ClientEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

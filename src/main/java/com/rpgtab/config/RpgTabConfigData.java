@@ -1,11 +1,12 @@
 package com.rpgtab.config;
 
+import com.rpgtab.RpgTabConstants;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public class RpgTabConfigData {
 
-    public String title = "ADVENTURERS OF THE REALM";
-    public int titleColor = 0xFFE5A93C;
+    public String title = RpgTabConstants.DEFAULT_TITLE;
+    public int titleColor = RpgTabConstants.DEFAULT_TITLE_COLOR;
     public boolean showOfflinePlayers = true;
 
     public boolean showAvatar = true;
@@ -18,13 +19,13 @@ public class RpgTabConfigData {
     public boolean showPlayTime = true;
     public boolean showPing = true;
 
-    public int healthColor = 0xFFFF7777;
-    public int foodColor = 0xFFFBBF24;
-    public int xpColor = 0xFF4ADE80;
-    public int deathsColor = 0xFFE2E8F0;
-    public int ftbColor = 0xFF38BDF8;
-    public int advColor = 0xFFFACC15;
-    public int playTimeColor = 0xFFA78BFA;
+    public int healthColor = RpgTabConstants.DEFAULT_HEALTH_COLOR;
+    public int foodColor = RpgTabConstants.DEFAULT_FOOD_COLOR;
+    public int xpColor = RpgTabConstants.DEFAULT_XP_COLOR;
+    public int deathsColor = RpgTabConstants.DEFAULT_DEATHS_COLOR;
+    public int ftbColor = RpgTabConstants.DEFAULT_FTB_COLOR;
+    public int advColor = RpgTabConstants.DEFAULT_ADV_COLOR;
+    public int playTimeColor = RpgTabConstants.DEFAULT_PLAYTIME_COLOR;
 
     public static int parseColor(String str, int defaultColor) {
         if (str == null || str.trim().isEmpty()) {
@@ -51,7 +52,7 @@ public class RpgTabConfigData {
     public static RpgTabConfigData fromServerConfig() {
         RpgTabConfigData data = new RpgTabConfigData();
         data.title = RpgTabServerConfig.CONFIG.title.get();
-        data.titleColor = parseColor(RpgTabServerConfig.CONFIG.titleColor.get(), 0xFFE5A93C);
+        data.titleColor = parseColor(RpgTabServerConfig.CONFIG.titleColor.get(), RpgTabConstants.DEFAULT_TITLE_COLOR);
         data.showOfflinePlayers = RpgTabServerConfig.CONFIG.showOfflinePlayers.get();
 
         data.showAvatar = RpgTabServerConfig.CONFIG.showAvatar.get();
@@ -64,13 +65,13 @@ public class RpgTabConfigData {
         data.showPlayTime = RpgTabServerConfig.CONFIG.showPlayTime.get();
         data.showPing = RpgTabServerConfig.CONFIG.showPing.get();
 
-        data.healthColor = parseColor(RpgTabServerConfig.CONFIG.healthColor.get(), 0xFFFF7777);
-        data.foodColor = parseColor(RpgTabServerConfig.CONFIG.foodColor.get(), 0xFFFBBF24);
-        data.xpColor = parseColor(RpgTabServerConfig.CONFIG.xpColor.get(), 0xFF4ADE80);
-        data.deathsColor = parseColor(RpgTabServerConfig.CONFIG.deathsColor.get(), 0xFFE2E8F0);
-        data.ftbColor = parseColor(RpgTabServerConfig.CONFIG.ftbColor.get(), 0xFF38BDF8);
-        data.advColor = parseColor(RpgTabServerConfig.CONFIG.advColor.get(), 0xFFFACC15);
-        data.playTimeColor = parseColor(RpgTabServerConfig.CONFIG.playTimeColor.get(), 0xFFA78BFA);
+        data.healthColor = parseColor(RpgTabServerConfig.CONFIG.healthColor.get(), RpgTabConstants.DEFAULT_HEALTH_COLOR);
+        data.foodColor = parseColor(RpgTabServerConfig.CONFIG.foodColor.get(), RpgTabConstants.DEFAULT_FOOD_COLOR);
+        data.xpColor = parseColor(RpgTabServerConfig.CONFIG.xpColor.get(), RpgTabConstants.DEFAULT_XP_COLOR);
+        data.deathsColor = parseColor(RpgTabServerConfig.CONFIG.deathsColor.get(), RpgTabConstants.DEFAULT_DEATHS_COLOR);
+        data.ftbColor = parseColor(RpgTabServerConfig.CONFIG.ftbColor.get(), RpgTabConstants.DEFAULT_FTB_COLOR);
+        data.advColor = parseColor(RpgTabServerConfig.CONFIG.advColor.get(), RpgTabConstants.DEFAULT_ADV_COLOR);
+        data.playTimeColor = parseColor(RpgTabServerConfig.CONFIG.playTimeColor.get(), RpgTabConstants.DEFAULT_PLAYTIME_COLOR);
 
         return data;
     }

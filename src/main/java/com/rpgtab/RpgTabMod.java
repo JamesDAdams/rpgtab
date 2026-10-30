@@ -11,10 +11,10 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-@Mod("rpgtab")
+@Mod(RpgTabConstants.MODID)
 public class RpgTabMod {
 
-    public static final String MODID = "rpgtab";
+    public static final String MODID = RpgTabConstants.MODID;
 
     public RpgTabMod(IEventBus modEventBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.SERVER, RpgTabServerConfig.SPEC, "rpgtab-server.toml");
@@ -22,7 +22,7 @@ public class RpgTabMod {
     }
 
     private void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1.0.0").optional();
+        PayloadRegistrar registrar = event.registrar(RpgTabConstants.PROTOCOL_VERSION).optional();
         registrar.playToClient(
                 SyncPlayerStatsPayload.TYPE,
                 SyncPlayerStatsPayload.STREAM_CODEC,
