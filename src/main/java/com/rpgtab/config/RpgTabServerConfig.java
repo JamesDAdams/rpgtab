@@ -60,58 +60,58 @@ public class RpgTabServerConfig {
 
     public RpgTabServerConfig(ModConfigSpec.Builder builder) {
         builder.push("general");
-        title = builder.comment("Titre affiche au dessus du tableau RPG")
+        title = builder.comment("Title displayed above the RPG player list")
                 .define("title", RpgTabConstants.DEFAULT_TITLE);
-        titleColor = builder.comment("Couleur du titre en hex (ex: 0xFFE5A93C)")
+        titleColor = builder.comment("Title color in hex format (e.g., 0xFFE5A93C)")
                 .define("titleColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_TITLE_COLOR).toUpperCase());
-        showOfflinePlayers = builder.comment("Afficher aussi les joueurs hors ligne ayant deja joue sur le serveur")
+        showOfflinePlayers = builder.comment("Display offline players who have previously played on this server")
                 .define("showOfflinePlayers", true);
         builder.pop();
 
         builder.push("columns");
-        showAvatar = builder.comment("Afficher l'avatar/tete du joueur").define("showAvatar", true);
-        showHealth = builder.comment("Afficher la barre de vie et les PV (ex: 24/24)").define("showHealth", true);
-        showFood = builder.comment("Afficher la faim").define("showFood", true);
-        showXp = builder.comment("Afficher le niveau d'experience").define("showXp", true);
-        showDeaths = builder.comment("Afficher le nombre de morts").define("showDeaths", true);
-        showFtbQuests = builder.comment("Afficher les quetes FTB Quests terminees").define("showFtbQuests", true);
-        showAdvancements = builder.comment("Afficher les progres/advancements termines").define("showAdvancements", true);
-        showPlayTime = builder.comment("Afficher le temps de jeu sur le serveur").define("showPlayTime", true);
-        showPing = builder.comment("Afficher le ping / latence").define("showPing", true);
-        showFps = builder.comment("Afficher les FPS du client en haut a droite du menu TAB (compatible GGTU)").define("showFps", true);
-        showDimension = builder.comment("Afficher la dimension actuelle du joueur (Overworld, Nether, End, etc.)").define("showDimension", true);
+        showAvatar = builder.comment("Display player skin face/avatar").define("showAvatar", true);
+        showHealth = builder.comment("Display health bar and numerical HP (e.g. 24/24)").define("showHealth", true);
+        showFood = builder.comment("Display hunger points").define("showFood", true);
+        showXp = builder.comment("Display player experience level").define("showXp", true);
+        showDeaths = builder.comment("Display player deaths count").define("showDeaths", true);
+        showFtbQuests = builder.comment("Display completed FTB Quests count").define("showFtbQuests", true);
+        showAdvancements = builder.comment("Display completed vanilla advancements count").define("showAdvancements", true);
+        showPlayTime = builder.comment("Display total player server playtime").define("showPlayTime", true);
+        showPing = builder.comment("Display network latency / ping").define("showPing", true);
+        showFps = builder.comment("Display client FPS in the top right corner of the TAB menu (GGTU compatible)").define("showFps", true);
+        showDimension = builder.comment("Display current dimension of the player (Overworld, Nether, End, etc.)").define("showDimension", true);
         builder.pop();
 
         builder.push("server_metrics");
-        showServerFooter = builder.comment("Activer le bandeau de statistiques du serveur en bas du TAB").define("showServerFooter", true);
-        showServerTps = builder.comment("Afficher les TPS et MSPT du serveur").define("showServerTps", true);
-        showServerCpu = builder.comment("Afficher le pourcentage CPU du serveur").define("showServerCpu", true);
-        showServerRam = builder.comment("Afficher l'utilisation de la RAM du serveur").define("showServerRam", true);
-        showServerUptime = builder.comment("Afficher le temps de fonctionnement (uptime) du serveur depuis le reboot").define("showServerUptime", true);
-        showServerNetwork = builder.comment("Afficher le debit reseau du serveur (DL et UL)").define("showServerNetwork", true);
-        showServerChunks = builder.comment("Afficher le nombre de chunks charges et en generation sur le serveur").define("showServerChunks", true);
-        showServerGpu = builder.comment("Afficher le GPU du serveur et l'etat d'acceleration C2ME OpenCL").define("showServerGpu", true);
-        showServerDh = builder.comment("Afficher le statut Distant Horizons cote serveur").define("showServerDh", true);
-        showServerSeedGen = builder.comment("Afficher le statut SeedGen cote serveur").define("showServerSeedGen", true);
+        showServerFooter = builder.comment("Enable the server hardware & performance footer bar at the bottom of the TAB overlay").define("showServerFooter", true);
+        showServerTps = builder.comment("Display server TPS and MSPT").define("showServerTps", true);
+        showServerCpu = builder.comment("Display server CPU usage percentage").define("showServerCpu", true);
+        showServerRam = builder.comment("Display server RAM usage and maximum allocation").define("showServerRam", true);
+        showServerUptime = builder.comment("Display server uptime since last reboot").define("showServerUptime", true);
+        showServerNetwork = builder.comment("Display real-time server network throughput (DL and UL)").define("showServerNetwork", true);
+        showServerChunks = builder.comment("Display loaded and generating world chunks count").define("showServerChunks", true);
+        showServerGpu = builder.comment("Display server GPU and C2ME OpenCL acceleration status").define("showServerGpu", true);
+        showServerDh = builder.comment("Display server Distant Horizons status").define("showServerDh", true);
+        showServerSeedGen = builder.comment("Display server SeedGen status").define("showServerSeedGen", true);
         builder.pop();
 
         builder.push("pelican_api");
-        pelicanUrl = builder.comment("URL du panel Pelican (ex: https://panel.example.com)").define("pelicanUrl", "");
+        pelicanUrl = builder.comment("Base URL of your Pelican Panel (e.g. https://panel.example.com)").define("pelicanUrl", "");
         pelicanApiKey = builder.comment(
-                "Cle API Client Pelican (Account Settings -> API Credentials / Tokens).\n" +
-                "Permissions requises : Permission de lecture 'server.resources' (Read resources / Read server metrics / WebSocket connection)."
+                "Pelican Client API Key (Account Settings -> API Credentials / Tokens).\n" +
+                "Required permission: 'server.resources' (Read resources / Read server metrics / WebSocket connection)."
         ).define("pelicanApiKey", "");
-        pelicanServerId = builder.comment("Identifiant court du serveur Pelican (ex: 39de0ded)").define("pelicanServerId", "");
+        pelicanServerId = builder.comment("Short server identifier on Pelican (e.g. 39de0ded)").define("pelicanServerId", "");
         builder.pop();
 
         builder.push("colors");
-        healthColor = builder.comment("Couleur texte PV (hex)").define("healthColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_HEALTH_COLOR).toUpperCase());
-        foodColor = builder.comment("Couleur texte Faim (hex)").define("foodColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_FOOD_COLOR).toUpperCase());
-        xpColor = builder.comment("Couleur texte XP (hex)").define("xpColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_XP_COLOR).toUpperCase());
-        deathsColor = builder.comment("Couleur texte Morts (hex)").define("deathsColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_DEATHS_COLOR).toUpperCase());
-        ftbColor = builder.comment("Couleur texte Quetes FTB (hex)").define("ftbColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_FTB_COLOR).toUpperCase());
-        advColor = builder.comment("Couleur texte Progres (hex)").define("advColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_ADV_COLOR).toUpperCase());
-        playTimeColor = builder.comment("Couleur texte Temps de jeu (hex)").define("playTimeColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_PLAYTIME_COLOR).toUpperCase());
+        healthColor = builder.comment("Health text color in hex").define("healthColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_HEALTH_COLOR).toUpperCase());
+        foodColor = builder.comment("Food text color in hex").define("foodColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_FOOD_COLOR).toUpperCase());
+        xpColor = builder.comment("XP text color in hex").define("xpColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_XP_COLOR).toUpperCase());
+        deathsColor = builder.comment("Deaths text color in hex").define("deathsColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_DEATHS_COLOR).toUpperCase());
+        ftbColor = builder.comment("FTB quests text color in hex").define("ftbColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_FTB_COLOR).toUpperCase());
+        advColor = builder.comment("Advancements text color in hex").define("advColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_ADV_COLOR).toUpperCase());
+        playTimeColor = builder.comment("Playtime text color in hex").define("playTimeColor", "0x" + Integer.toHexString(RpgTabConstants.DEFAULT_PLAYTIME_COLOR).toUpperCase());
         builder.pop();
     }
 }
