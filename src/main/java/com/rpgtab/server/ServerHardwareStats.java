@@ -20,6 +20,8 @@ public class ServerHardwareStats implements Serializable {
     private final int totalGeneratingChunks;
     private final int dhGeneratingChunks;
     private final int seedGenGeneratingChunks;
+    private final int viewDistance;
+    private final int simulationDistance;
     private final boolean c2meOpenclLoaded;
     private final boolean dhLoaded;
     private final boolean seedGenLoaded;
@@ -30,7 +32,7 @@ public class ServerHardwareStats implements Serializable {
                                long usedRamBytes, long maxRamBytes, long usedSwapBytes, long maxSwapBytes,
                                long uptimeSeconds, long networkRxBytes, long networkTxBytes,
                                int totalLoadedChunks, int totalGeneratingChunks, int dhGeneratingChunks,
-                               int seedGenGeneratingChunks,
+                               int seedGenGeneratingChunks, int viewDistance, int simulationDistance,
                                boolean c2meOpenclLoaded, boolean dhLoaded, boolean seedGenLoaded,
                                String gpuName, String gpuStats) {
         this.tps = tps;
@@ -48,11 +50,26 @@ public class ServerHardwareStats implements Serializable {
         this.totalGeneratingChunks = Math.max(0, totalGeneratingChunks);
         this.dhGeneratingChunks = Math.max(0, dhGeneratingChunks);
         this.seedGenGeneratingChunks = Math.max(0, seedGenGeneratingChunks);
+        this.viewDistance = Math.max(0, viewDistance);
+        this.simulationDistance = Math.max(0, simulationDistance);
         this.c2meOpenclLoaded = c2meOpenclLoaded;
         this.dhLoaded = dhLoaded;
         this.seedGenLoaded = seedGenLoaded;
         this.gpuName = gpuName != null ? gpuName : "";
         this.gpuStats = gpuStats != null ? gpuStats : "";
+    }
+
+    public ServerHardwareStats(float tps, float mspt, double cpuUsage, int maxCpuPercent,
+                               long usedRamBytes, long maxRamBytes, long usedSwapBytes, long maxSwapBytes,
+                               long uptimeSeconds, long networkRxBytes, long networkTxBytes,
+                               int totalLoadedChunks, int totalGeneratingChunks, int dhGeneratingChunks,
+                               int seedGenGeneratingChunks,
+                               boolean c2meOpenclLoaded, boolean dhLoaded, boolean seedGenLoaded,
+                               String gpuName, String gpuStats) {
+        this(tps, mspt, cpuUsage, maxCpuPercent, usedRamBytes, maxRamBytes, usedSwapBytes, maxSwapBytes,
+                uptimeSeconds, networkRxBytes, networkTxBytes, totalLoadedChunks, totalGeneratingChunks,
+                dhGeneratingChunks, seedGenGeneratingChunks, 0, 0,
+                c2meOpenclLoaded, dhLoaded, seedGenLoaded, gpuName, gpuStats);
     }
 
     public float getTps() {
@@ -115,6 +132,14 @@ public class ServerHardwareStats implements Serializable {
         return seedGenGeneratingChunks;
     }
 
+    public int getViewDistance() {
+        return viewDistance;
+    }
+
+    public int getSimulationDistance() {
+        return simulationDistance;
+    }
+
     public boolean isC2meOpenclLoaded() {
         return c2meOpenclLoaded;
     }
@@ -152,7 +177,9 @@ public class ServerHardwareStats implements Serializable {
     }
 
     public String getFormattedChunks() {
-        if (totalGeneratingChunks > 0) {
+        if (viewDistance > 0 && simulationDistance > 0) {
+            return viewDistance + "/" + simulationDistance + " chunks";
+        } else if (totalGeneratingChunks > 0) {
             return totalLoadedChunks + " loaded (Gen: " + totalGeneratingChunks + ")";
         } else {
             return totalLoadedChunks + " loaded";
@@ -207,6 +234,8 @@ public class ServerHardwareStats implements Serializable {
         buf.writeVarInt(totalGeneratingChunks);
         buf.writeVarInt(dhGeneratingChunks);
         buf.writeVarInt(seedGenGeneratingChunks);
+        buf.writeVarInt(viewDistance);
+        buf.writeVarInt(simulationDistance);
         buf.writeBoolean(c2meOpenclLoaded);
         buf.writeBoolean(dhLoaded);
         buf.writeBoolean(seedGenLoaded);
@@ -230,12 +259,14 @@ public class ServerHardwareStats implements Serializable {
         int genChunks = buf.readVarInt();
         int dhGenChunks = buf.readVarInt();
         int sgGenChunks = buf.readVarInt();
+        int viewDist = buf.readVarInt();
+        int simDist = buf.readVarInt();
         boolean c2me = buf.readBoolean();
         boolean dh = buf.readBoolean();
         boolean seedGen = buf.readBoolean();
         String gpu = buf.readUtf();
         String stats = buf.readUtf();
         return new ServerHardwareStats(tps, mspt, cpu, maxCpu, usedRam, maxRam, usedSwap, maxSwap, uptime, rx, tx,
-                loadedChunks, genChunks, dhGenChunks, sgGenChunks, c2me, dh, seedGen, gpu, stats);
+                loadedChunks, genChunks, dhGenChunks, sgGenChunks, viewDist, simDist, c2me, dh, seedGen, gpu, stats);
     }
 }

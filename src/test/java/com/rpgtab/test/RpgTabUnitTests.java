@@ -304,6 +304,26 @@ public class RpgTabUnitTests {
         if (!"850 loaded (Gen: 4)".equals(stats.getFormattedChunks())) {
             throw new AssertionError("Formatted chunks mismatch: " + stats.getFormattedChunks());
         }
+
+        // Test view distance and simulation distance
+        com.rpgtab.server.ServerHardwareStats statsWithDist = new com.rpgtab.server.ServerHardwareStats(
+                20.0f, 10.0f, 50.0, 600, 4L * 1024L * 1024L * 1024L, 16L * 1024L * 1024L * 1024L,
+                0L, 8L * 1024L * 1024L * 1024L, 1000L, 100L, 100L, 100, 0, 0, 0, 12, 10,
+                false, false, false, "", ""
+        );
+        if (statsWithDist.getViewDistance() != 12 || statsWithDist.getSimulationDistance() != 10) {
+            throw new AssertionError("View/simulation distance mismatch");
+        }
+        if (!"12/10 chunks".equals(statsWithDist.getFormattedChunks())) {
+            throw new AssertionError("Formatted chunks with distance mismatch: " + statsWithDist.getFormattedChunks());
+        }
+
+        // Test fallback on null server in collector
+        if (com.rpgtab.server.ChunkStatsCollector.getViewDistance(null) != 10 ||
+                com.rpgtab.server.ChunkStatsCollector.getSimulationDistance(null) != 10) {
+            throw new AssertionError("ChunkStatsCollector null fallback mismatch");
+        }
+
         if (!"42%".equals(stats.getGpuStats())) {
             throw new AssertionError("GpuStats mismatch: " + stats.getGpuStats());
         }

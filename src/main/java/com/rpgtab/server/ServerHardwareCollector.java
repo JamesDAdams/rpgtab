@@ -466,6 +466,8 @@ public class ServerHardwareCollector {
         int totalGeneratingChunks = ChunkStatsCollector.getTotalGeneratingChunks(server);
         int dhGeneratingChunks = ChunkStatsCollector.getDhGeneratingChunksCount();
         int seedGenGeneratingChunks = ChunkStatsCollector.getSeedGenGeneratingChunksCount();
+        int viewDistance = ChunkStatsCollector.getViewDistance(server);
+        int simulationDistance = ChunkStatsCollector.getSimulationDistance(server);
 
         boolean c2me = isC2meOpenclLoaded();
         boolean dh = isDhLoaded();
@@ -475,6 +477,7 @@ public class ServerHardwareCollector {
 
         return new ServerHardwareStats(tps, mspt, cpu, maxCpuPercent, usedRam, maxRam, usedSwap, maxSwap, uptimeSec,
                 rxBytes, txBytes, totalLoadedChunks, totalGeneratingChunks, dhGeneratingChunks, seedGenGeneratingChunks,
+                viewDistance, simulationDistance,
                 c2me, dh, seedGen, gpu, gpuStats);
     }
 }

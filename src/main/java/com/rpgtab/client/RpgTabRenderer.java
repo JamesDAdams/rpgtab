@@ -285,7 +285,16 @@ public class RpgTabRenderer {
         // Ligne 2 : Chunks serveur, Distant Horizons & C2ME OpenCL
         StringBuilder line2Sb = new StringBuilder();
         if (cfg.showServerChunks) {
-            line2Sb.append("§2☵ ").append(stats.getFormattedChunks());
+            String chunksText = stats.getFormattedChunks();
+            Minecraft mc = Minecraft.getInstance();
+            if ((stats.getViewDistance() <= 0 || stats.getSimulationDistance() <= 0) && mc != null) {
+                int view = mc.options != null ? mc.options.getEffectiveRenderDistance() : 10;
+                int sim = (mc.level != null && mc.level.getServerSimulationDistance() > 0)
+                        ? mc.level.getServerSimulationDistance()
+                        : (mc.options != null ? mc.options.simulationDistance().get() : 10);
+                chunksText = view + "/" + sim + " chunks";
+            }
+            line2Sb.append("§2☵ ").append(chunksText);
         }
         if (cfg.showServerDh && stats.isDhLoaded()) {
             if (line2Sb.length() > 0) line2Sb.append(" §8| ");

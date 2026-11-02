@@ -90,4 +90,42 @@ public class ChunkStatsCollector {
         } catch (Throwable ignored) {}
         return total;
     }
+
+    public static int getViewDistance(MinecraftServer server) {
+        if (server == null) return 10;
+        try {
+            Class<?> settingClass = Class.forName("me.wesley1808.servercore.common.dynamic.DynamicSetting");
+            Object viewSetting = settingClass.getField("VIEW_DISTANCE").get(null);
+            if (viewSetting != null) {
+                int val = (int) settingClass.getMethod("get").invoke(viewSetting);
+                if (val > 0) return val;
+            }
+        } catch (Throwable ignored) {}
+
+        try {
+            if (server.getPlayerList() != null) {
+                return server.getPlayerList().getViewDistance();
+            }
+        } catch (Throwable ignored) {}
+        return 10;
+    }
+
+    public static int getSimulationDistance(MinecraftServer server) {
+        if (server == null) return 10;
+        try {
+            Class<?> settingClass = Class.forName("me.wesley1808.servercore.common.dynamic.DynamicSetting");
+            Object simSetting = settingClass.getField("SIMULATION_DISTANCE").get(null);
+            if (simSetting != null) {
+                int val = (int) settingClass.getMethod("get").invoke(simSetting);
+                if (val > 0) return val;
+            }
+        } catch (Throwable ignored) {}
+
+        try {
+            if (server.getPlayerList() != null) {
+                return server.getPlayerList().getSimulationDistance();
+            }
+        } catch (Throwable ignored) {}
+        return 10;
+    }
 }
